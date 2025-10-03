@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -36,6 +37,40 @@ func readFileWithCache(filepath string) ([]byte, error) {
 	fileCacheLock.Unlock()
 	
 	return content, nil
+}
+
+// ValidateDivisionComponents 验证拆分部件是否在映射表中定义
+func ValidateDivisionComponents(divTable map[string][]*types.Division, compMap map[string]string) error {
+	invalidComponents := make(map[string][]string) // 部件 -> [位置信息]
+	lineNumber := 0
+
+	for char, divisions := range divTable {
+		for _, division := range divisions {
+			lineNumber++
+			for _, component := range division.Divs {
+				if _, exists := compMap[component]; !exists {
+					position := fmt.Sprintf("行号: %d, 字符: %s", lineNumber, char)
+					invalidComponents[component] = append(invalidComponents[component], position)
+				}
+			}
+		}
+	}
+
+	if len(invalidComponents) > 0 {
+		var errorMessages []string
+		for component, positions := range invalidComponents {
+			// 只显示前3个位置，避免输出过长
+			displayPositions := positions
+			if len(positions) > 3 {
+				displayPositions = positions[:3]
+			}
+			errorMessages = append(errorMessages,
+				fmt.Sprintf("非法部件: %s (出现位置: %s...)", component, strings.Join(displayPositions, ", ")))
+		}
+		return fmt.Errorf("发现非法部件:\n%s", strings.Join(errorMessages, "\n"))
+	}
+
+	return nil
 }
 
 func ReadDivisionTable(filepath string) (table map[string][]*types.Division, err error) {
@@ -76,27 +111,6 @@ func ReadDivisionTable(filepath string) (table map[string][]*types.Division, err
 	return
 }
 
-func ReadCharSimpTable(filepath string) (table map[string][]*types.CharSimp, err error) {
-	buffer, err := readFileWithCache(filepath)
-	if err != nil {
-		return
-	}
-
-	table = map[string][]*types.CharSimp{}
-	for _, line := range strings.Split(string(buffer), "\n") {
-		if len(line) == 0 || strings.HasPrefix(line, "#") {
-			continue
-		}
-		line := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
-		simp := types.CharSimp{
-			Char: line[0],
-			Simp: line[1],
-		}
-		table[simp.Char] = append(table[simp.Char], &simp)
-	}
-
-	return
-}
 
 func ReadCompMap(filepath string) (mappings map[string]string, err error) {
 	buffer, err := readFileWithCache(filepath)
@@ -131,79 +145,46 @@ func ReadCharFreq(filepath string) (freqSet map[string]int64, err error) {
 		line := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
 		char, freqStr := line[0], line[1]
 		freq, _ := strconv.ParseFloat(freqStr, 64)
-		freqSet[char] = int64(freq * 1e8)
+		freqSet[char] = int64(freq)
 	}
 
 	return
 }
 
-func ReadPhraseFreq(filepath string) (freqSet map[string]int64, err error) {
+
+
+
+// ReadWordsFile 读取多字词文件
+func ReadWordsFile(filepath string) ([]*types.WordEntry, error) {
 	buffer, err := readFileWithCache(filepath)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	freqSet = map[string]int64{}
-	lines := strings.Split(string(buffer), "\n")
-	for i, line := range lines {
-		if len(line) == 0 || strings.HasPrefix(line, "#") {
-			continue
-		}
-		line := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
-		// phrase, freqStr := line[0], line[1]
-		// freqSet[phrase], _ = strconv.ParseInt(freqStr, 10, 64)
-		phrase := line[0]
-		if _, ok := freqSet[phrase]; !ok {
-			freqSet[phrase] = int64(len(lines) - i)
-		}
-	}
-
-	return
-}
-
-func ReadCJKExtWhitelist(filepath string) (whitelist map[rune]bool, err error) {
-	buffer, err := readFileWithCache(filepath)
-	if err != nil {
-		return
-	}
-
-	whitelist = map[rune]bool{}
-	lines := strings.Split(string(buffer), "\n")
-	for _, line := range lines {
-		if len(line) == 0 || strings.HasPrefix(line, "#") {
-			continue
-		}
-		char := strings.SplitN(strings.TrimRight(line, "\r\n"), "\t", 1)[0]
-		if len(char) == 0 {
-			continue
-		}
-		whitelist[[]rune(char)[0]] = true
-	}
-
-	return
-}
-
-// ReadStrokeTable 读取笔画表
-func ReadStrokeTable(filepath string) (table map[string]string, err error) {
-	buffer, err := readFileWithCache(filepath)
-	if err != nil {
-		return
-	}
-
-	table = map[string]string{}
+	wordEntries := make([]*types.WordEntry, 0)
 	for _, line := range strings.Split(string(buffer), "\n") {
+		line = strings.TrimSpace(line)
 		if len(line) == 0 || strings.HasPrefix(line, "#") {
 			continue
 		}
-		// 格式：汉字\t笔画序列
-		line := strings.Split(strings.TrimRight(line, "\r\n"), "\t")
-		if len(line) < 2 {
+
+		// 使用制表符或空格分割
+		fields := strings.Fields(line)
+		if len(fields) == 0 {
 			continue
 		}
-		
-		// 存储汉字及其笔画序列
-		table[line[0]] = line[1]
+
+		word := fields[0]
+		weight := ""
+		if len(fields) >= 2 {
+			weight = fields[1]
+		}
+
+		wordEntries = append(wordEntries, &types.WordEntry{
+			Word:   word,
+			Weight: weight,
+		})
 	}
 
-	return
+	return wordEntries, nil
 }

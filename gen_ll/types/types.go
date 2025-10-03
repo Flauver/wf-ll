@@ -41,3 +41,23 @@ type PhraseTip struct {
 	Phrase  string
 	CPhrase string
 }
+
+// WordEntry 多字词条目
+type WordEntry struct {
+	Word   string // 词语
+	Weight string // 权重（可选）
+}
+
+// WordCode 多字词编码
+type WordCode struct {
+	Word   string // 词语
+	Code   string // 编码
+	Weight string // 权重（可选）
+}
+
+// WordSimpleCode 多字词简码
+type WordSimpleCode struct {
+	Word   string // 词语
+	Code   string // 简码
+	Weight string // 权重（可选）
+}

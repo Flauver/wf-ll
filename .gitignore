@@ -5,6 +5,7 @@
 /assets/gendict/target
 /assets/gendict_LL/target
 /deploy/generator
+/deploy/tmp
 /schemas/hao/build
 /schemas/hao/installation.yaml
 /schemas/hao/default.custom.yaml
