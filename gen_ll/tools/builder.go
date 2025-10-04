@@ -79,8 +79,8 @@ func BuildFullCodeMetaList(table map[string][]*types.Division, mappings map[stri
 	// 等待所有协程完成
 	wg.Wait()
 	
-	// 排序结果
-	sortCharMetaByCode(charMetaList)
+	// 排序结果 - 按词频降序排序
+	sortCharMetaByFreq(charMetaList)
 	return
 }
 
@@ -101,6 +101,26 @@ func sortCharMetaByCode(charMetaList []*types.CharMeta) {
 		}
 		
 		// 编码和词频都相同，按字符Unicode编码升序排列
+		return a.Char < b.Char
+	})
+}
+
+func sortCharMetaByFreq(charMetaList []*types.CharMeta) {
+	// 按词频降序排列，词频相同时按编码升序排列
+	sort.Slice(charMetaList, func(i, j int) bool {
+		a, b := charMetaList[i], charMetaList[j]
+		
+		// 首先按词频降序排列
+		if a.Freq != b.Freq {
+			return a.Freq > b.Freq
+		}
+		
+		// 词频相同，按编码升序排列
+		if a.Code != b.Code {
+			return a.Code < b.Code
+		}
+		
+		// 词频和编码都相同，按字符Unicode编码升序排列
 		return a.Char < b.Char
 	})
 }
@@ -350,6 +370,8 @@ func BuildSimpleCodeList(fullCodeList []*types.CharMeta, lenCodeLimit map[int]in
 		}
 	}
 	
+	// 按词频排序结果
+	sortCharMetaByFreq(resultData)
 	return resultData
 }
 
@@ -426,18 +448,12 @@ func CreateCharCodeMap(charMetaList []*types.CharMeta) map[string]string {
 }
 
 // SortWordCodes 对多字词编码进行排序
-// 排序规则：先按编码升序排列，编码相同时按权重降序排列
+// 排序规则：先按权重降序排列，权重相同时按编码升序排列
 func SortWordCodes(wordCodes []*types.WordCode) {
 	sort.Slice(wordCodes, func(i, j int) bool {
 		a, b := wordCodes[i], wordCodes[j]
 		
-		// 首先按编码升序排列
-		if a.Code != b.Code {
-			return a.Code < b.Code
-		}
-		
-		// 编码相同，按权重降序排列
-		// 将权重字符串转换为数值进行比较
+		// 首先按权重降序排列
 		weightA := parseWeight(a.Weight)
 		weightB := parseWeight(b.Weight)
 		
@@ -445,7 +461,12 @@ func SortWordCodes(wordCodes []*types.WordCode) {
 			return weightA > weightB
 		}
 		
-		// 编码和权重都相同，按词语Unicode编码升序排列（保持稳定排序）
+		// 权重相同，按编码升序排列
+		if a.Code != b.Code {
+			return a.Code < b.Code
+		}
+		
+		// 权重和编码都相同，按词语Unicode编码升序排列（保持稳定排序）
 		return a.Word < b.Word
 	})
 }

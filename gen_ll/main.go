@@ -32,6 +32,9 @@ type Args struct {
 	WordsLenCodeLimit string `flag:"L" usage:"多字词简码长度限制，格式：1:4,2:4,3:4,4:0" default:"1:4,2:4,3:4,4:0"`
 	CPUProfile string `flag:"p" usage:"CPU性能分析文件" default:"/tmp/gen_ll.prof"`
 	Debug      bool   `flag:"D" usage:"调试模式" default:"false"`
+	CitiPre    string `flag:"c" usage:"输出ll_citi_pre.txt文件" default:"/tmp/ll_citi_pre.txt"`
+	GendaCiti  string `flag:"g" usage:"输出genda_citi.txt文件" default:"/tmp/genda_citi.txt"`
+	ProcessCiti bool  `flag:"C" usage:"处理citi文件" default:"false"`
 }
 
 var args Args
@@ -63,6 +66,8 @@ func main() {
 	ensureOutputDir(args.WordsFull)
 	ensureOutputDir(args.WordsSimple)
 	ensureOutputDir(args.DazhuChai)
+	ensureOutputDir(args.CitiPre)
+	ensureOutputDir(args.GendaCiti)
 
 	// 解析简码长度限制
 	lenCodeLimit, err := tools.ParseLenCodeLimit(args.LenCodeLimit)
@@ -310,13 +315,8 @@ func main() {
 			defer wg.Done()
 			buffer := bytes.Buffer{}
 			
-			// 对多字词编码进行排序
-			// 先按编码升序排列，编码相同时按权重降序排列
-			sortedWordCodes := make([]*types.WordCode, len(wordCodes))
-			copy(sortedWordCodes, wordCodes)
-			tools.SortWordCodes(sortedWordCodes)
-			
-			for _, wordCode := range sortedWordCodes {
+			// 保持ll_words.txt的原始顺序，不进行排序
+			for _, wordCode := range wordCodes {
 				if wordCode.Weight != "" {
 					buffer.WriteString(fmt.Sprintf("%s\t%s\t%s\n", wordCode.Word, wordCode.Code, wordCode.Weight))
 				} else {
@@ -372,6 +372,17 @@ func main() {
 	// 输出处理时间
 	if !args.Quiet {
 		fmt.Printf("处理完成，总耗时: %v\n", utils.Since(startTime))
+	}
+
+	// 处理citi文件
+	if args.ProcessCiti {
+		log.Println("开始处理citi文件...")
+		err := tools.ProcessCitiFilesComplete(args.Simple, args.Full, args.WordsSimple, args.WordsFull, args.CitiPre, args.GendaCiti)
+		if err != nil {
+			log.Printf("处理citi文件失败: %v", err)
+		} else {
+			log.Println("citi文件处理完成")
+		}
 	}
 }
 

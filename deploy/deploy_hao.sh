@@ -88,6 +88,9 @@ gen_schema() {
         -S "${LL}/code_words_simp.txt" \
         -o "${LL}/div_ll.txt" \
         -Z "${LL}/dazhu_chai.txt" \
+        -C \
+        -c "${LL}/ll_citi_pre.txt" \
+        -g "${LL}/genda_citi.txt" \
         || error "生成离乱码表失败"
 }
 
