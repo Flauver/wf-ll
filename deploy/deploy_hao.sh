@@ -41,7 +41,7 @@ create_ramdisk() {
 }
 
 # 清理和准备目录
-rm -rf "${SCHEMAS}/ll/build" "${SCHEMAS}/releases"
+rm -rf "${SCHEMAS}/ll/build" "${SCHEMAS}/releases" "${SCHEMAS}/ll/lua/chars_cand.userdb"
 create_ramdisk
 mkdir -p "${SCHEMAS}/releases"
 
@@ -67,7 +67,7 @@ gen_schema() {
     #cp ../table/*.txt "${LL}" || error "复制码表文件失败"
     cp ../template/*.yaml "${LL}" || error "复制模板文件失败"
     cp -r ../template/lua "${LL}/lua" || error "复制 Lua 脚本失败"
-    cp -r ../template/opencc "${LL}/opencc" || error "复制 OpenCC 配置失败"
+    #cp -r ../template/opencc "${LL}/opencc" || error "复制 OpenCC 配置失败"
     # 使用自定义配置覆盖默认值
     if [ -d "${NAME}" ]; then
         log "应用自定义配置..."

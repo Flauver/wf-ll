@@ -274,7 +274,7 @@ func main() {
 				continue
 			}
 			div := strings.Join(charMeta.Division.Divs, "")
-			buffer.WriteString(fmt.Sprintf("%s\t(%s·%s·%s·%s·%s)\n",
+			buffer.WriteString(fmt.Sprintf("%s\t[%s·%s·%s·%s·%s]\n",
 	   			charMeta.Char,
 	   			div,
 	   			charMeta.Full,

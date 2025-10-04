@@ -10,6 +10,7 @@ schema:
   dependencies:
     - &py PY
     - &bh xtroke
+    - &cf LL_chaifen
   description: |
     前缀码 + 高性能多重简词
     ` 键拼音反查，e在「,」，i在「.」。symbols符号输入同理。
@@ -18,9 +19,13 @@ switches:
   - name: chars_cand
     states: [ 字候选关, 字候选开 ]
     reset: 1 
-  - name: &div chaifen
+  - options:
+      - ll_spelling.off
+      - ll_spelling.lv1
+      - ll_spelling.lv2
+      - ll_spelling.lv3
+    states: [无注解, 一重注解, 二重注解, 多重注解]
     reset: 0
-    states: [ 隐, 显 ]
   - name: ascii_mode
     reset: 0
     states: [  中, 英  ]
@@ -36,6 +41,7 @@ engine:
     - lua_processor@*ll.chars_cand
     - ascii_composer
     - recognizer
+    - lua_processor@*ll.div_spelling*processor
     - key_binder
     - lua_processor@*moran.moran_pin*pin_processor
     - speller
@@ -65,8 +71,8 @@ engine:
     - history_translator@historyX
   filters: 
     - lua_filter@*moran.moran_pin*pin_filter
-    - simplifier@chaifen
     - reverse_lookup_filter@reverse_lookup
+    - lua_filter@*ll.div_spelling*filter
     - uniquifier 
 
 speller:
@@ -121,7 +127,8 @@ reverse_lookup:
   extra_tags:
     - PY_lookup
     - xtroke_lookup
-  comment_format: []
+  comment_format: 
+    - xform/\]/根/
 
 PY_lookup:
   tag: PY_lookup
@@ -154,16 +161,14 @@ historyX:
   size: 10
   initial_quality: 10
 
-chaifen:
-  opencc_config: ll_chaifen.json
-  option_name: *div
-  show_in_comment: true 
-  comment_format:     
-    - "xform/&nbsp;/ /"
-  tags:
-    - abc
-    - reverse_lookup
-  tips: all # all char
+ll:
+  code: *schema
+  tags: [ abc ]
+  spelling:
+    schema: *cf
+    cycle_key: "Shift+Control+C"
+    switch_key: "Control+c"
+    phrase: 1
 
 key_binder:
   bindings:
@@ -182,7 +187,6 @@ key_binder:
     - {accept: "Control+Shift+E", toggle: ascii_mode, when: always} 
     - {accept: "Control+Shift+N", toggle: ascii_mode, when: always} 
     - {accept: "Control+Shift+.", toggle: ascii_punct, when: always}
-    - {accept: "Control+i", toggle: chaifen, when: always}
 
 menu:
   alternative_select_labels: [ '_', 'e', 'i', 'T|[', '2', '3', '4|7', 'C|8', 'S|9', '1|0']
