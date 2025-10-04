@@ -35,6 +35,7 @@ type Args struct {
 	CitiPre    string `flag:"c" usage:"输出ll_citi_pre.txt文件" default:"/tmp/ll_citi_pre.txt"`
 	GendaCiti  string `flag:"g" usage:"输出genda_citi.txt文件" default:"/tmp/genda_citi.txt"`
 	ProcessCiti bool  `flag:"C" usage:"处理citi文件" default:"false"`
+	DazhuCode   string `flag:"z" usage:"输出dazhu_code.txt文件" default:"/tmp/dazhu_code.txt"`
 }
 
 var args Args
@@ -68,6 +69,7 @@ func main() {
 	ensureOutputDir(args.DazhuChai)
 	ensureOutputDir(args.CitiPre)
 	ensureOutputDir(args.GendaCiti)
+	ensureOutputDir(args.DazhuCode)
 
 	// 解析简码长度限制
 	lenCodeLimit, err := tools.ParseLenCodeLimit(args.LenCodeLimit)
@@ -382,6 +384,15 @@ func main() {
 			log.Printf("处理citi文件失败: %v", err)
 		} else {
 			log.Println("citi文件处理完成")
+			
+			// 生成dazhu_code.txt
+			log.Println("开始生成dazhu_code.txt...")
+			err := tools.CreateDazhuCode(args.GendaCiti, args.DazhuCode, 30)
+			if err != nil {
+				log.Printf("生成dazhu_code.txt失败: %v", err)
+			} else {
+				log.Println("dazhu_code.txt生成完成")
+			}
 		}
 	}
 }

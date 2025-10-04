@@ -375,3 +375,45 @@ func ProcessCitiFilesComplete(charsSimpFile, charsFullFile, wordsSimpFile, words
 
 	return nil
 }
+
+// CreateDazhuCode 根据genda_citi.txt生成dazhu_code.txt，格式为"编码\t字词"
+func CreateDazhuCode(gendaCitiFile, dazhuCodeFile string, maxSizeMB int) error {
+	// 读取genda_citi.txt文件
+	entries, err := ReadCitiFile(gendaCitiFile, "genda_citi")
+	if err != nil {
+		return fmt.Errorf("读取genda_citi.txt失败: %w", err)
+	}
+
+	// 创建输出文件
+	file, err := os.Create(dazhuCodeFile)
+	if err != nil {
+		return fmt.Errorf("创建文件失败: %w", err)
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	maxSizeBytes := maxSizeMB * 1024 * 1024
+	currentSize := 0
+
+	// 按"编码\t字词"格式写入，并控制文件大小
+	for _, entry := range entries {
+		line := fmt.Sprintf("%s\t%s\n", entry.Code, entry.Text)
+		lineSize := len([]byte(line))
+		
+		// 检查是否超过最大文件大小
+		if currentSize+lineSize > maxSizeBytes {
+			break
+		}
+		
+		if _, err := writer.WriteString(line); err != nil {
+			return fmt.Errorf("写入文件失败: %w", err)
+		}
+		currentSize += lineSize
+	}
+
+	if err := writer.Flush(); err != nil {
+		return fmt.Errorf("刷新文件失败: %w", err)
+	}
+
+	return nil
+}

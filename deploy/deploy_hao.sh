@@ -91,6 +91,7 @@ gen_schema() {
         -C \
         -c "${LL}/ll_citi_pre.txt" \
         -g "${LL}/genda_citi.txt" \
+        -z "${LL}/dazhu_code.txt" \
         || error "生成离乱码表失败"
 }
 
