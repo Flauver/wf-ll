@@ -395,6 +395,69 @@ func main() {
 			}
 		}
 	}
+
+	// 新增功能：将生成的文件追加到输出目录的字典文件
+	if !args.Quiet {
+		fmt.Println("开始将生成的文件追加到字典文件...")
+	}
+	
+	// 获取输出目录
+	outputDir := filepath.Dir(args.Full)
+	
+	// 将div_ll.txt追加到LL_chaifen.dict.yaml
+	if !args.Quiet {
+		fmt.Println("将div_ll.txt追加到LL_chaifen.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.Opencc, filepath.Join(outputDir, "LL_chaifen.dict.yaml"), false, false)
+	if err != nil {
+		log.Printf("追加div_ll.txt到LL_chaifen.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Println("div_ll.txt追加到LL_chaifen.dict.yaml完成")
+	}
+	
+	// 将code_chars_simp.txt追加到LL.chars.quick.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		fmt.Println("将code_chars_simp.txt追加到LL.chars.quick.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.Simple, filepath.Join(outputDir, "LL.chars.quick.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加code_chars_simp.txt到LL.chars.quick.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Println("code_chars_simp.txt追加到LL.chars.quick.dict.yaml完成")
+	}
+	
+	// 将code_chars_full.txt追加到LL.chars.full.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		fmt.Println("将code_chars_full.txt追加到LL.chars.full.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.Full, filepath.Join(outputDir, "LL.chars.full.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加code_chars_full.txt到LL.chars.full.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Println("code_chars_full.txt追加到LL.chars.full.dict.yaml完成")
+	}
+	
+	// 将code_words_simp.txt追加到LL.words.quick.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		fmt.Println("将code_words_simp.txt追加到LL.words.quick.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.WordsSimple, filepath.Join(outputDir, "LL.words.quick.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加code_words_simp.txt到LL.words.quick.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Println("code_words_simp.txt追加到LL.words.quick.dict.yaml完成")
+	}
+	
+	// 将code_words_full.txt追加到LL.words.full.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		fmt.Println("将code_words_full.txt追加到LL.words.full.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.WordsFull, filepath.Join(outputDir, "LL.words.full.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加code_words_full.txt到LL.words.full.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Println("code_words_full.txt追加到LL.words.full.dict.yaml完成")
+	}
 }
 
 // 确保输出目录存在

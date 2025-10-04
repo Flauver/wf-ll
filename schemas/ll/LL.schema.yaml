@@ -1,0 +1,292 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: &schema LL
+  name: 离乱
+  version: release
+  author:
+    - 荒
+  dependencies:
+    - &py PY
+    - &bh xtroke
+  description: |
+    前缀码 + 高性能多重简词
+    ` 键拼音反查，e在「,」，i在「.」。symbols符号输入同理。
+
+switches:
+  - name: chars_cand
+    states: [ 字候选关, 字候选开 ]
+    reset: 1 
+  - name: &div chaifen
+    reset: 0
+    states: [ 隐, 显 ]
+  - name: ascii_mode
+    reset: 0
+    states: [  中, 英  ]
+  - name: full_shape
+    states: [  半, 全  ]
+    reset: 0
+  - name: ascii_punct
+    states: ["。", "．"]
+    reset: 0
+
+engine:
+  processors:
+    - lua_processor@*ll.chars_cand
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - lua_processor@*moran.moran_pin*pin_processor
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - affix_segmentor@PY_lookup
+    - affix_segmentor@xtroke_lookup
+    - affix_segmentor@reverse_lookup
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - history_translator
+    - script_translator@PY_lookup
+    - table_translator@xtroke_lookup
+    - table_translator@fixed
+    - table_translator
+    - table_translator@zaoci
+    - lua_translator@*ll.speed_stats
+    - lua_translator@*moran.moran_pin*panacea_translator
+    - history_translator@historyX
+  filters: 
+    - lua_filter@*moran.moran_pin*pin_filter
+    - simplifier@chaifen
+    - reverse_lookup_filter@reverse_lookup
+    - uniquifier 
+
+speller:
+  alphabet: qwrtyuopasdfghjkl;'zxcvbnm,./]
+  delimiter: "`"
+  #max_code_length: 4
+  #initials: qwrtyuopasdfghjkl;zxcvbnm,./]
+  #auto_clear: max_length
+  auto_select: true
+  #auto_select_unique_candidate: true
+  #auto_select_pattern: ^w.$|^.*[wruo]$
+  #delimiter: []
+
+# 固定词库词的权重，防止自动调频
+fixed:
+  __include: translator
+  enable_sentence: false
+  enable_user_dict: false
+  initial_quality: 1000000
+
+translator:
+  dictionary: *schema
+  prism: *schema
+  enable_completion: false
+  enable_sentence: false
+  enable_user_dict: true
+  enable_encoder: true
+  encode_commit_history: false
+  max_phrase_length: 4
+  always_show_comments: true
+  preedit_format: []
+  comment_format:
+    - "xform/^~/ /"
+
+zaoci:
+  __include: translator
+  initial_quality: 0
+  enable_sentence: true
+  enable_user_dict: true
+  prefix: "`"
+  tips: "〔用户造詞〕"
+  tag: zaoci
+
+# 拼音反查
+reverse_lookup:
+  tag: reverse_lookup
+  dictionary: *schema
+  prefix: "`"    # 反查引导符「`」
+  tips: 【反查：拼音+超级笔画】
+  closing_tips: 【反查关闭】
+  tags: [ PY_lookup, xtroke_lookup ]
+  extra_tags:
+    - PY_lookup
+    - xtroke_lookup
+  comment_format: []
+
+PY_lookup:
+  tag: PY_lookup
+  dictionary: *py
+  enable_user_dict: false
+  prefix: '`P'
+  tips: 【拼音反查】
+  closing_tips: 【反查关闭】
+  initial_quality: 0.2
+  preedit_format:
+    - xform/^(.*?),/$1e/
+    - xform/^(.*)\./$1i/
+
+xtroke_lookup:
+  tag: xtroke_lookup
+  dictionary: *bh
+  prism: xtroke
+  enable_user_dict: false
+  prefix: '`X'
+  tips: 【超级笔画反查】
+  closing_tips: 【反查关闭】
+  initial_quality: 0.5
+  preedit_format:
+    - 'xform/^([hspnz]+)$/$1\t（\U$1\E）/'
+    - xlit/HSPNZ/一丨丿丶乙/
+  comment_format: []
+
+historyX:
+  input: 'wj'
+  size: 10
+  initial_quality: 10
+
+chaifen:
+  opencc_config: ll_chaifen.json
+  option_name: *div
+  show_in_comment: true 
+  comment_format:     
+    - "xform/&nbsp;/ /"
+  tags:
+    - abc
+    - reverse_lookup
+  tips: all # all char
+
+key_binder:
+  bindings:
+    - {accept: "e", send: "A", when: has_menu} 
+    - {accept: "i", send: "B", when: has_menu} 
+    - {accept: "[", send: "C", when: has_menu} 
+    - {accept: Tab, send: "C", when: has_menu} 
+    - {accept: 1, send: "0", when: has_menu} 
+    - {accept: 4, send: "7", when: has_menu} 
+    #- {accept: "Control+Control_L", send: "8", when: has_menu} 
+    - {accept: "Shift+Shift_L", send: "9", when: has_menu} 
+    - {accept: minus, send: Page_Up, when: has_menu} 
+    - {accept: equal, send: Page_Down, when: has_menu} 
+    #- {accept: Return, send: Escape, when: composing}    # 回车清屏
+    - {accept: "Control+Shift+O", toggle: full_shape, when: always} 
+    - {accept: "Control+Shift+E", toggle: ascii_mode, when: always} 
+    - {accept: "Control+Shift+N", toggle: ascii_mode, when: always} 
+    - {accept: "Control+Shift+.", toggle: ascii_punct, when: always}
+    - {accept: "Control+i", toggle: chaifen, when: always}
+
+menu:
+  alternative_select_labels: [ '_', 'e', 'i', 'T|[', '2', '3', '4|7', 'C|8', 'S|9', '1|0']
+  alternative_select_keys: "_ABC237890"
+  page_size: 10
+
+punctuator:
+  half_shape:
+    ',' : []
+    '.' : []
+    '<' : [ 《, 〈, «, ‹, ⟨, ˂, ˱ ]
+    '>' : [ 》, 〉, », ›, ⟩, ˃, ˲ ]
+    '/' : []
+    '?' : { commit: ？ }
+    ';' : []
+    ':' : { commit: ： }
+    '''': { commit: 。 }
+    '"' : { pair: [ '“', '”' ] }
+    '\' : { commit: 、 }
+    '|' : [ ·, ・, '|', ｜, '§', '¦', '‖' ]
+    '`' : [ '`', ‵, ‶, ‷, ′, ″, ‴, ⁗ ]
+    '~' : [ '~', ～, ˜, ˷, ⸯ, ≈, ≋, ≃, ≅, ≇, ∽, ⋍, ≌, ﹏, ﹋, ﹌, ︴ ]
+    '!' : { commit: ！ }
+    '@' : [ '@', ©, ®, ℗ ]
+    '#' : [ '#', № ]
+    '%' : [ '%', ％, '°', '℃', ‰, ‱, ℉, ℅, ℆, ℀, ℁, ⅍ ]
+    '$' : [ ￥, '$', '€', '£', '¥', '¢', '¤', ₩ ]
+    '^' : { commit: …… }
+    '&' : '&'
+    '*' : [ '*', ＊, ·, ・, ×, ※, ❂, ⁂, ☮, ☯, ☣ ]
+    '(' : （
+    ')' : ）
+    '-' : '-'
+    '_' : ——
+    '+' : '+'
+    '=' : [ '=', 々, 〃 ]
+    '[' : [ 「, 【, 〔, ［, 〚, 〘 ]
+    ']' : [ 」, 】, 〕, ］, 〛, 〙 ]
+    '{' : [ 『, 〖, ｛ ]
+    '}' : [ 』, 〗, ｝ ]
+  half_shape:
+    ',' : []
+    '.' : []
+    '<' : [ 《, 〈, «, ‹, ⟨, ˂, ˱ ]
+    '>' : [ 》, 〉, », ›, ⟩, ˃, ˲ ]
+    '/' : []
+    '?' : { commit: ？ }
+    ';' : []
+    ':' : { commit: ： }
+    '''': { commit: 。 }
+    '"' : { pair: [ '“', '”' ] }
+    '\' : [ 、, '\', ＼ ]
+    '|' : [ ·, ・, '|', ｜, '§', '¦', '‖', ︴ ]
+    '`' : [ '`', ‵, ‶, ‷, ′, ″, ‴, ⁗ ]
+    '~' : [ '~', ～, ˜, ˷, ⸯ, ≈, ≋, ≃, ≅, ≇, ∽, ⋍, ≌, ﹏, ﹋, ﹌, ︴ ]
+    '!' : { commit: ！ }
+    '@' : [ '@', ©, ®, ℗ ]
+    '#' : [ '#', № ]
+    '%' : [ '%', ％, '°', '℃', ‰, ‱, ℉, ℅, ℆, ℀, ℁, ⅍ ]
+    '$' : [ ￥, '$', '€', '£', '¥', '¢', '¤', ₩ ]
+    '^' : { commit: …… }
+    '&' : '&'
+    '*' : [ '*', ＊, ·, ・, ×, ※, ❂, ⁂, ☮, ☯, ☣ ]
+    '(' : （
+    ')' : ）
+    '-' : '-'
+    '_' : ——
+    '+' : '+'
+    '=' : [ '=', 々, 〃 ]
+    '[' : [ 「, 【, 〔, ［, 〚, 〘 ]
+    ']' : [ 」, 】, 〕, ］, 〛, 〙 ]
+    '{' : [ 『, 〖, ｛ ]
+    '}' : [ 』, 〗, ｝ ]
+  symbols:
+    __include: symbols:/punctuator/symbols
+
+moran:
+  # 「置頂」功能相關設置
+  # 輸入時通過快捷鍵 Ctrl+t 可以將高亮顯示的候選置頂，被置頂的候選位置固定，不再參與調頻
+  # 對同一輸入碼最高支持8個置頂詞，當嘗試置頂第9個詞時，最早被置頂的詞將會失效
+  pin:
+    # 「置頂」功能開關
+    enable: true
+    # 置頂詞提示符
+    indicator: "📌"
+    # 「萬靈藥」加詞功能
+    # 通過輸入 「編碼A」//「編碼B」 實現造詞功能，編碼A是這個新詞的新編碼 編碼B是目前可以打出該詞的編碼
+    # 例如 輸入 tnfb 不能得到「頭腦風暴」這一候選， 此時我們可以輸入 tnfb//tbnkfgbk 按下空格 讓「頭腦風暴」候選上屏，上屏的詞會被加入用戶詞庫中，之後我們可以用 tnfb 來得到「頭腦風暴」這一候選了
+    # 造出的詞與置頂詞是等同的
+    panacea:
+      # 加詞狀態提示
+      prompt: "〔加詞〕"
+      # 加詞中綴引導符
+      infix: "]"
+      # 自由加詞模式開關，開啓此模式後，輸入「編碼A」//並空格上屏後會進入加詞狀態，此時可以連續地、不受束縛地輸入，再次按下x//空格退出加詞狀態，期間輸入的內容將會被記錄爲「編碼A」的新置頂詞
+      # 此模式適合造一些混合詞，如「A4紙」、「KOS-MOS」等
+      freestyle: true
+
+recognizer:
+  #import_preset: default
+  patterns:
+    reverse_lookup: "^`([qwrtyuopasdfghjklzxcvbnm,.]+?)*$"
+    PY_lookup: "^`P([qwrtyuopasdfghjklzxcvbnm,.]+'?)*$"
+    xtroke_lookup: "^`X([hspnz]+'?)*$"
+    zaoci: "^[qwrtyuopasdfghjklzxcvbnm;,./]*`[qwrtyuopasdfghjklzxcvbnm;,./`]*$"
+    roots: "][qwrtyuopasdfghjklzxcvbnm;,/]*"
+    punct: '^\|([QWRTYUOPASDFGHJKLZXCVBNM<>qwrtyuopasdfghjklzxcvbnm,.]+)$'

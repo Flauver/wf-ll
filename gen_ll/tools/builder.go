@@ -1,6 +1,10 @@
 package tools
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -589,4 +593,436 @@ func SortWordSimpleCodes(wordSimpleCodes []*types.WordSimpleCode) {
 		// 编码和权重都相同，按词语Unicode编码升序排列（保持稳定排序）
 		return a.Word < b.Word
 	})
+}
+
+// DictEntry 表示字典条目
+type DictEntry struct {
+	Text string
+	Code string
+	Freq int64
+}
+
+// AppendToDictFile 将源文件内容追加到目标字典文件
+// sourceFile: 源文件路径
+// targetFile: 目标字典文件路径
+// needSort: 是否需要排序（编码升序，重码组内按词频降序）
+// removeFreq: 是否需要删除词频列
+func AppendToDictFile(sourceFile, targetFile string, needSort, removeFreq bool) error {
+	var sourceContent string
+	var err error
+	
+	if needSort {
+		// 如果需要排序，使用readSourceFile读取完整的DictEntry列表
+		entries, err := readSourceFile(sourceFile, !removeFreq) // 保留词频用于排序
+		if err != nil {
+			return fmt.Errorf("读取源文件失败: %w", err)
+		}
+		
+		// 排序
+		sortDictEntries(entries)
+		
+		// 构建排序后的内容
+		var result strings.Builder
+		for _, entry := range entries {
+			result.WriteString(fmt.Sprintf("%s\t%s\n", entry.Text, entry.Code))
+		}
+		sourceContent = result.String()
+	} else {
+		// 如果不需要排序，直接读取内容
+		sourceContent, err = readSourceFileContent(sourceFile, removeFreq)
+		if err != nil {
+			return fmt.Errorf("读取源文件失败: %w", err)
+		}
+	}
+	
+	// 简单的追加操作：在目标文件末尾添加源文件内容
+	err = appendToFile(targetFile, sourceContent)
+	if err != nil {
+		return fmt.Errorf("追加到目标文件失败: %w", err)
+	}
+	
+	return nil
+}
+
+// readSourceFileContent 读取源文件内容并处理词频列
+func readSourceFileContent(filepath string, removeFreq bool) (string, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	
+	var content strings.Builder
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		
+		fields := strings.Split(line, "\t")
+		if len(fields) < 2 {
+			continue
+		}
+		
+		// 如果需要删除词频，只保留前两列
+		if removeFreq && len(fields) >= 3 {
+			content.WriteString(fmt.Sprintf("%s\t%s\n", fields[0], fields[1]))
+		} else {
+			content.WriteString(line + "\n")
+		}
+	}
+	
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+	
+	return content.String(), nil
+}
+
+// sortSourceContent 对源文件内容进行排序
+func sortSourceContent(content string) string {
+	lines := strings.Split(strings.TrimSpace(content), "\n")
+	
+	// 解析为DictEntry列表进行排序
+	var entries []*DictEntry
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		fields := strings.Split(line, "\t")
+		if len(fields) >= 2 {
+			entry := &DictEntry{
+				Text: fields[0],
+				Code: fields[1],
+			}
+			// 如果有词频信息，解析词频
+			if len(fields) >= 3 {
+				freq, err := strconv.ParseInt(fields[2], 10, 64)
+				if err == nil {
+					entry.Freq = freq
+				} else {
+					// 如果解析失败，设置默认词频为0
+					entry.Freq = 0
+				}
+			} else {
+				// 如果没有词频信息，设置默认词频为0
+				entry.Freq = 0
+			}
+			entries = append(entries, entry)
+		}
+	}
+	
+	// 排序
+	sortDictEntries(entries)
+	
+	// 重新构建内容
+	var result strings.Builder
+	for _, entry := range entries {
+		result.WriteString(fmt.Sprintf("%s\t%s\n", entry.Text, entry.Code))
+	}
+	
+	return result.String()
+}
+
+// appendToFile 将内容追加到文件末尾
+func appendToFile(filepath, content string) error {
+	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	
+	_, err = file.WriteString(content)
+	return err
+}
+
+// readSourceFile 读取源文件并解析为DictEntry列表
+func readSourceFile(filepath string, removeFreq bool) ([]*DictEntry, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	
+	var entries []*DictEntry
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		
+		fields := strings.Split(line, "\t")
+		if len(fields) < 2 {
+			continue
+		}
+		
+		entry := &DictEntry{
+			Text: fields[0],
+			Code: fields[1],
+		}
+		
+		// 如果有第三列且不需要删除词频，解析词频
+		if len(fields) >= 3 && !removeFreq {
+			freq, err := strconv.ParseInt(fields[2], 10, 64)
+			if err == nil {
+				entry.Freq = freq
+			}
+		}
+		
+		entries = append(entries, entry)
+	}
+	
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	
+	return entries, nil
+}
+
+// readDictFile 读取字典文件并解析为DictEntry列表
+func readDictFile(filepath string) ([]*DictEntry, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// 文件不存在，返回空列表
+			return []*DictEntry{}, nil
+		}
+		return nil, err
+	}
+	defer file.Close()
+	
+	var entries []*DictEntry
+	scanner := bufio.NewScanner(file)
+	
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		
+		// 跳过注释和元数据
+		if strings.HasPrefix(line, "#") || line == "---" || line == "..." {
+			continue
+		}
+		
+		// 检查是否进入数据部分
+		if strings.HasPrefix(line, "name:") || strings.HasPrefix(line, "version:") ||
+		   strings.HasPrefix(line, "sort:") || strings.HasPrefix(line, "columns:") ||
+		   strings.HasPrefix(line, "encoder:") {
+			continue
+		}
+		
+		// 跳过空行
+		if line == "" {
+			continue
+		}
+		
+		// 解析数据行
+		fields := strings.Split(line, "\t")
+		if len(fields) >= 2 {
+			entry := &DictEntry{
+				Text: fields[0],
+				Code: fields[1],
+			}
+			entries = append(entries, entry)
+		}
+	}
+	
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	
+	return entries, nil
+}
+
+// sortDictEntries 对字典条目进行排序
+// 排序规则：编码升序，重码组内按词频降序（与跟打词提的排序规则保持一致）
+func sortDictEntries(entries []*DictEntry) {
+	// 使用sort.SliceStable进行稳定排序，确保词频相同时保持原始顺序
+	sort.SliceStable(entries, func(i, j int) bool {
+		a, b := entries[i], entries[j]
+		
+		// 首先按编码升序排列
+		if a.Code != b.Code {
+			return a.Code < b.Code
+		}
+		
+		// 编码相同，按词频降序排列
+		return a.Freq > b.Freq
+	})
+}
+
+// mergeDictEntries 合并字典条目，避免重复
+func mergeDictEntries(existing, new []*DictEntry) []*DictEntry {
+	// 创建现有条目的映射
+	existingMap := make(map[string]string)
+	for _, entry := range existing {
+		existingMap[entry.Text] = entry.Code
+	}
+	
+	// 创建结果列表，先包含现有条目
+	result := make([]*DictEntry, len(existing))
+	copy(result, existing)
+	
+	// 添加新条目，避免重复
+	for _, entry := range new {
+		if _, exists := existingMap[entry.Text]; !exists {
+			result = append(result, entry)
+		}
+	}
+	
+	return result
+}
+
+// writeDictFile 将字典条目写入文件
+func writeDictFile(filepath string, entries []*DictEntry) error {
+	// 读取原始文件的完整内容
+	originalContent, err := readDictFileContent(filepath)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	
+	writer := bufio.NewWriter(file)
+	
+	// 写入原始头部信息
+	if originalContent != "" {
+		// 找到数据部分的开始位置
+		dataStart := findDataSectionStart(originalContent)
+		if dataStart > 0 {
+			// 写入头部信息
+			writer.WriteString(originalContent[:dataStart])
+		} else {
+			// 如果没有找到数据部分，写入默认头部
+			writer.WriteString(getDefaultHeader(filepath))
+		}
+	} else {
+		// 文件不存在，写入默认头部
+		writer.WriteString(getDefaultHeader(filepath))
+	}
+	
+	// 写入数据条目
+	for _, entry := range entries {
+		line := fmt.Sprintf("%s\t%s\n", entry.Text, entry.Code)
+		if _, err := writer.WriteString(line); err != nil {
+			return err
+		}
+	}
+	
+	// 写入尾部信息
+	writer.WriteString("...\n")
+	
+	return writer.Flush()
+}
+
+// readDictFileContent 读取字典文件的完整内容
+func readDictFileContent(filepath string) (string, error) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", nil
+		}
+		return "", err
+	}
+	defer file.Close()
+	
+	content, err := os.ReadFile(filepath)
+	if err != nil {
+		return "", err
+	}
+	
+	return string(content), nil
+}
+
+// findDataSectionStart 找到数据部分的开始位置
+func findDataSectionStart(content string) int {
+	lines := strings.Split(content, "\n")
+	
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		// 数据行以非注释、非元数据的制表符分隔内容开始
+		if trimmed != "" &&
+		   !strings.HasPrefix(trimmed, "#") &&
+		   !strings.HasPrefix(trimmed, "---") &&
+		   !strings.HasPrefix(trimmed, "...") &&
+		   !strings.HasPrefix(trimmed, "name:") &&
+		   !strings.HasPrefix(trimmed, "version:") &&
+		   !strings.HasPrefix(trimmed, "sort:") &&
+		   !strings.HasPrefix(trimmed, "columns:") &&
+		   !strings.HasPrefix(trimmed, "encoder:") &&
+		   !strings.HasPrefix(trimmed, "exclude_patterns:") &&
+		   !strings.HasPrefix(trimmed, "rules:") &&
+		   strings.Contains(trimmed, "\t") {
+			// 返回这个数据行之前的所有内容
+			pos := 0
+			for j := 0; j < i; j++ {
+				pos += len(lines[j]) + 1 // +1 for newline
+			}
+			return pos
+		}
+	}
+	
+	return -1
+}
+
+// getDefaultHeader 根据文件名返回默认头部信息
+func getDefaultHeader(filePath string) string {
+	filename := filepath.Base(filePath)
+	
+	var name string
+	var description string
+	
+	switch filename {
+	case "LL.chars.quick.dict.yaml":
+		name = "LL.chars.quick"
+		description = "离乱单字简码"
+	case "LL.chars.full.dict.yaml":
+		name = "LL.chars.full"
+		description = "离乱单字全码"
+	case "LL.words.quick.dict.yaml":
+		name = "LL.words.quick"
+		description = "离乱词简码"
+	case "LL.words.full.dict.yaml":
+		name = "LL.words.full"
+		description = "离乱词全码"
+	case "LL_chaifen.dict.yaml":
+		name = "LL_chaifen"
+		description = "离乱拆分注释"
+	default:
+		name = "default"
+		description = "离乱字典文件"
+	}
+	
+	return fmt.Sprintf(`# encoding: utf-8
+#
+# %s
+# 版本: 20251001
+#
+
+---
+name: %s
+version: 0x00
+sort: original
+columns:
+  - text
+  - code
+encoder:
+  exclude_patterns:
+    - "^[a-z,./]$" # 一简
+    - "^[a-z,./][wruo]$"
+    #- "^.{1}$"
+    #- "^.{1}[wruo]$"
+  rules:
+    - length_equal: 2
+      formula: "AaAbBaBb"
+    - length_equal: 3
+      formula: "AaBaCaCb"
+    - length_in_range: [4, 20]
+      formula: "AaBaCaZa"
+`, description, name)
 }

@@ -87,12 +87,22 @@ gen_schema() {
         -W "${LL}/code_words_full.txt" \
         -S "${LL}/code_words_simp.txt" \
         -o "${LL}/div_ll.txt" \
-        -Z "${LL}/dazhu_chai.txt" \
+        -Z "${LL}/大竹_chai.txt" \
         -C \
         -c "${LL}/ll_citi_pre.txt" \
-        -g "${LL}/genda_citi.txt" \
-        -z "${LL}/dazhu_code.txt" \
+        -g "${LL}/跟打词提.txt" \
+        -z "${LL}/大竹_code.txt" \
         || error "生成离乱码表失败"
+
+    log "准备生成Rime方案..."
+    rsync -a --exclude='/code_*.txt' \
+        --exclude='/div_ll.txt' \
+        --exclude='/freq.txt' \
+        --exclude='/ll_citi_pre.txt' \
+        --exclude='/ll_div.txt' \
+        --exclude='/ll_map.txt' \
+        --exclude='/ll_words.txt' \
+        "${LL}/" "${SCHEMAS}/${NAME}/" || error "复制文件失败"
 }
 
 # 主程序
