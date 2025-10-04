@@ -62,8 +62,8 @@ gen_schema() {
     export ASSETS_DIR="${LL}"
     mkdir -p "${LL}" || error "无法创建必要目录"
 
-    # 复制基础文件到内存
-    log "复制基础文件到内存..."
+    # 复制基础文件到临时目录
+    log "复制基础文件到临时目录..."
     #cp ../table/*.txt "${LL}" || error "复制码表文件失败"
     cp ../template/*.yaml "${LL}" || error "复制模板文件失败"
     cp -r ../template/lua "${LL}/lua" || error "复制 Lua 脚本失败"
@@ -104,10 +104,44 @@ gen_schema() {
         --exclude='/ll_div.txt' \
         --exclude='/ll_map.txt' \
         --exclude='/ll_words.txt' \
-        "${LL}/" "${SCHEMAS}/${NAME}/" || error "复制文件失败"
+        "${LL}/" "${SCHEMAS}/ll/" || error "复制文件失败"
+
+    # 打包发布
+    log "打包发布文件..."
+    pushd "${SCHEMAS}" || error "无法切换到发布目录"
+        tar -cf - \
+            --exclude="*userdb" \
+            --exclude="sync" \
+            --exclude="*.custom.yaml" \
+            --exclude="installation.yaml" \
+            --exclude="user.yaml" \
+            --exclude="squirrel.yaml" \
+            --exclude="weasel.yaml" \
+            --exclude="LL.txt" \
+            --exclude="大竹*.txt" \
+            --exclude="speed_stats.conf" \
+            "./ll" | \
+            zstd -9 -T0 -c \
+            > "releases/${NAME}-${REF_NAME}.tar.zst" \
+            || error "打包失败"
+        log "打包仓输入法包..."
+        (cd "./ll" && zip -9 -r -q "../releases/${NAME}-${REF_NAME}.zip" . \
+            -x "*userdb*" \
+            -x "sync/**" \
+            -x "*.custom.yaml" \
+            -x "installation.yaml" \
+            -x "user.yaml" \
+            -x "squirrel.yaml" \
+            -x "weasel.yaml" \
+            -x "LL.txt" \
+            -x "大竹*.txt" \
+            -x "跟打词提.txt" \
+            -x "speed_stats.conf") || error "仓输入法包打包失败"
+    popd
+    log "方案 ${NAME} 生成完成"
 }
 
 # 主程序
 log "开始部署离乱输入法..."
-gen_schema ll || error "生成离乱方案失败"
+gen_schema 离乱 || error "生成离乱方案失败"
 log "部署完成"
