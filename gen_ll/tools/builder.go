@@ -1026,3 +1026,99 @@ encoder:
       formula: "AaBaCaZa"
 `, description, name)
 }
+
+// BuildPresetData 根据单字简码表生成 preset_data.txt
+func BuildPresetData(simpleCodeList []*types.CharMeta) ([]string, error) {
+	// 按前缀分组
+	prefixGroups := make(map[string][]*types.CharMeta)
+	
+	for _, charMeta := range simpleCodeList {
+		code := charMeta.Code
+		// 只有当编码长度大于1时才有前缀
+		if len(code) > 1 {
+			prefix := code[:len(code)-1]  // 去掉最后一个字符作为前缀
+			prefixGroups[prefix] = append(prefixGroups[prefix], charMeta)
+		}
+	}
+	
+	// 生成输出行
+	outputLines := make([]string, 0, len(prefixGroups))
+	
+	for prefix, chars := range prefixGroups {
+		// 按照末码类型将字符分类
+		wChars := make([]string, 0)
+		rChars := make([]string, 0)
+		uChars := make([]string, 0)
+		oChars := make([]string, 0)
+		
+		for _, charMeta := range chars {
+			code := charMeta.Code
+			lastChar := string(code[len(code)-1])
+			
+			switch lastChar {
+			case "w":
+				wChars = append(wChars, charMeta.Char)
+			case "r":
+				rChars = append(rChars, charMeta.Char)
+			case "u":
+				uChars = append(uChars, charMeta.Char)
+			case "o":
+				oChars = append(oChars, charMeta.Char)
+			}
+		}
+		
+		// 固定的后缀顺序：w, r, u, o
+		suffixes := []string{"w", "r", "u", "o"}
+		
+		// 构建候选项
+		candidates := make([]string, 0, 4)
+		for _, suffix := range suffixes {
+			var candidate string
+			switch suffix {
+			case "w":
+				if len(wChars) > 0 {
+					candidate = suffix + wChars[0]
+				} else {
+					candidate = suffix + "①"
+				}
+			case "r":
+				if len(rChars) > 0 {
+					candidate = suffix + rChars[0]
+				} else {
+					candidate = suffix + "②"
+				}
+			case "u":
+				if len(uChars) > 0 {
+					candidate = suffix + uChars[0]
+				} else {
+					candidate = suffix + "③"
+				}
+			case "o":
+				if len(oChars) > 0 {
+					candidate = suffix + oChars[0]
+				} else {
+					candidate = suffix + "④"
+				}
+			}
+			candidates = append(candidates, candidate)
+		}
+		
+		// 将四个候选项用空格连接
+		candidateStr := strings.Join(candidates, " ")
+		outputLine := candidateStr + "\t" + prefix
+		outputLines = append(outputLines, outputLine)
+	}
+	
+	// 按编码（code）升序排列
+	sort.Slice(outputLines, func(i, j int) bool {
+		// 提取每行的编码部分（制表符后的内容）
+		partsI := strings.Split(outputLines[i], "\t")
+		partsJ := strings.Split(outputLines[j], "\t")
+		if len(partsI) >= 2 && len(partsJ) >= 2 {
+			return partsI[1] < partsJ[1]
+		}
+		return outputLines[i] < outputLines[j]
+	})
+
+	return outputLines, nil
+}

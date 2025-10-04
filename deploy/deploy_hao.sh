@@ -92,6 +92,7 @@ gen_schema() {
         -c "${LL}/ll_citi_pre.txt" \
         -g "${LL}/跟打词提.txt" \
         -z "${LL}/大竹_code.txt" \
+        -P "${LL}/lua/chars_cand/preset_data.txt" \
         || error "生成离乱码表失败"
 
     log "准备生成Rime方案..."

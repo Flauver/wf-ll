@@ -36,6 +36,7 @@ type Args struct {
 	GendaCiti  string `flag:"g" usage:"输出genda_citi.txt文件" default:"/tmp/genda_citi.txt"`
 	ProcessCiti bool  `flag:"C" usage:"处理citi文件" default:"false"`
 	DazhuCode   string `flag:"z" usage:"输出dazhu_code.txt文件" default:"/tmp/dazhu_code.txt"`
+	PresetData string `flag:"P" usage:"输出preset_data.txt文件" default:"/tmp/lua/chars_cand/preset_data.txt"`
 }
 
 var args Args
@@ -70,6 +71,7 @@ func main() {
 	ensureOutputDir(args.CitiPre)
 	ensureOutputDir(args.GendaCiti)
 	ensureOutputDir(args.DazhuCode)
+	ensureOutputDir(args.PresetData)
 
 	// 解析简码长度限制
 	lenCodeLimit, err := tools.ParseLenCodeLimit(args.LenCodeLimit)
@@ -184,9 +186,20 @@ func main() {
 		fmt.Println("开始写入文件...")
 	}
 
+	// 生成 preset_data.txt
+	if !args.Quiet {
+		fmt.Println("开始生成 preset_data.txt...")
+	}
+	presetDataLines, err := tools.BuildPresetData(simpleCodeList)
+	if err != nil {
+		log.Printf("生成 preset_data.txt 失败: %v", err)
+	} else if !args.Quiet {
+		fmt.Printf("preset_data.txt 生成完成，共 %d 项\n", len(presetDataLines))
+	}
+
 	// 使用并行处理加速文件写入
 	var wg sync.WaitGroup
-	fileCount := 4 // 基础文件：FULLCHAR, SIMPLECODE, DIVISION, DAZHUCHAI
+	fileCount := 5 // 基础文件：FULLCHAR, SIMPLECODE, DIVISION, DAZHUCHAI, PRESETDATA
 	if wordCodes != nil {
 		fileCount++
 	}
@@ -333,6 +346,21 @@ func main() {
 			}
 		}()
 	}
+
+	// PRESETDATA - preset_data.txt
+	go func() {
+		defer wg.Done()
+		buffer := bytes.Buffer{}
+		for _, line := range presetDataLines {
+			buffer.WriteString(line + "\n")
+		}
+		err := os.WriteFile(args.PresetData, buffer.Bytes(), 0o644)
+		if err != nil {
+			errChan <- fmt.Errorf("写入PRESETDATA文件错误: %w", err)
+		} else if !args.Quiet {
+			fmt.Printf("PRESETDATA文件写入完成: %s\n", args.PresetData)
+		}
+	}()
 
 	// 写入多字词简码表
 	if wordSimpleCodes != nil {
