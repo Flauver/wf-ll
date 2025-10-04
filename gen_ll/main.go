@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"gen_ll/tools"
 	"gen_ll/types"
@@ -37,11 +38,16 @@ type Args struct {
 	ProcessCiti bool  `flag:"C" usage:"处理citi文件" default:"false"`
 	DazhuCode   string `flag:"z" usage:"输出dazhu_code.txt文件" default:"/tmp/dazhu_code.txt"`
 	PresetData string `flag:"P" usage:"输出preset_data.txt文件" default:"/tmp/lua/chars_cand/preset_data.txt"`
+	RootsDict  string `flag:"R" usage:"输出LL.roots.dict.yaml文件" default:"/tmp/LL.roots.dict.yaml"`
 }
 
 var args Args
 
 func main() {
+	// 设置自定义日志格式，与Shell脚本保持一致
+	log.SetFlags(0)
+	log.SetOutput(new(logWriter))
+
 	err := utils.ParseFlags(&args)
 	if err != nil {
 		log.Fatalf("解析参数失败: %v", err)
@@ -72,6 +78,7 @@ func main() {
 	ensureOutputDir(args.GendaCiti)
 	ensureOutputDir(args.DazhuCode)
 	ensureOutputDir(args.PresetData)
+	ensureOutputDir(args.RootsDict)
 
 	// 解析简码长度限制
 	lenCodeLimit, err := tools.ParseLenCodeLimit(args.LenCodeLimit)
@@ -89,7 +96,7 @@ func main() {
 	startTime := utils.Now()
 
 	if !args.Quiet {
-		fmt.Println("开始加载表格数据...")
+		log.Println("开始加载表格数据...")
 	}
 
 	divTable, err := tools.ReadDivisionTable(args.Div)
@@ -97,7 +104,7 @@ func main() {
 		log.Fatalf("读取拆分表失败: %v", err)
 	}
 	if !args.Quiet {
-		fmt.Printf("拆分表加载完成，共 %d 项\n", len(divTable))
+		log.Printf("拆分表加载完成，共 %d 项\n", len(divTable))
 	}
 
 	compMap, err := tools.ReadCompMap(args.Map)
@@ -105,18 +112,18 @@ func main() {
 		log.Fatalf("读取映射表失败: %v", err)
 	}
 	if !args.Quiet {
-		fmt.Printf("映射表加载完成，共 %d 项\n", len(compMap))
+		log.Printf("映射表加载完成，共 %d 项\n", len(compMap))
 	}
 
 	// 验证拆分部件是否在映射表中定义
 	if !args.Quiet {
-		fmt.Println("开始验证拆分部件...")
+		log.Println("开始验证拆分部件...")
 	}
 	if err := tools.ValidateDivisionComponents(divTable, compMap); err != nil {
 		log.Fatalf("验证失败: %v", err)
 	}
 	if !args.Quiet {
-		fmt.Println("拆分部件验证通过")
+		log.Println("拆分部件验证通过")
 	}
 
 	freqSet, err := tools.ReadCharFreq(args.Freq)
@@ -124,35 +131,35 @@ func main() {
 		log.Fatalf("读取频率表失败: %v", err)
 	}
 	if !args.Quiet {
-		fmt.Printf("频率表加载完成，共 %d 项\n", len(freqSet))
+		log.Printf("频率表加载完成，共 %d 项\n", len(freqSet))
 	}
 
 	if !args.Quiet {
-		fmt.Println("开始构建编码数据...")
+		log.Println("开始构建编码数据...")
 	}
 
 	buildStartTime := utils.Now()
 	fullCodeMetaList := tools.BuildFullCodeMetaList(divTable, compMap, freqSet)
 	
 	if !args.Quiet {
-		fmt.Printf("构建完成，耗时: %v\n", utils.Since(buildStartTime))
-		fmt.Printf("fullCodeMetaList: %d\n", len(fullCodeMetaList))
-		fmt.Println("开始写入文件...")
+		log.Printf("构建完成，耗时: %v\n", utils.Since(buildStartTime))
+		log.Printf("fullCodeMetaList: %d\n", len(fullCodeMetaList))
+		log.Println("开始写入文件...")
 	}
 
 	// 读取多字词文件并生成多字词全码和简码
 	var wordCodes []*types.WordCode
 	var wordSimpleCodes []*types.WordSimpleCode
 	if !args.Quiet {
-		fmt.Println("开始读取多字词文件...")
+		log.Println("开始读取多字词文件...")
 	}
 	wordEntries, err := tools.ReadWordsFile(args.Words)
 	if err != nil {
 		log.Printf("读取多字词文件失败: %v", err)
 	} else {
 		if !args.Quiet {
-			fmt.Printf("多字词文件加载完成，共 %d 项\n", len(wordEntries))
-			fmt.Println("开始生成多字词全码...")
+			log.Printf("多字词文件加载完成，共 %d 项\n", len(wordEntries))
+			log.Println("开始生成多字词全码...")
 		}
 		
 		// 创建字符编码映射
@@ -162,39 +169,39 @@ func main() {
 		wordCodes = tools.BuildWordsFullCode(wordEntries, charCodeMap)
 		
 		if !args.Quiet {
-			fmt.Printf("多字词全码生成完成，共 %d 项\n", len(wordCodes))
-			fmt.Println("开始生成多字词简码...")
+			log.Printf("多字词全码生成完成，共 %d 项\n", len(wordCodes))
+			log.Println("开始生成多字词简码...")
 		}
 		
 		// 生成多字词简码
 		wordSimpleCodes = tools.BuildWordsSimpleCode(wordCodes, wordsLenCodeLimit)
 		
 		if !args.Quiet {
-			fmt.Printf("多字词简码生成完成，共 %d 项\n", len(wordSimpleCodes))
+			log.Printf("多字词简码生成完成，共 %d 项\n", len(wordSimpleCodes))
 		}
 	}
 
 	// 生成简码表
 	if !args.Quiet {
-		fmt.Println("开始生成简码表...")
+		log.Println("开始生成简码表...")
 	}
 	noSimplifyChars := []string{"的", "了"} // 不出简的字符列表
 	simpleCodeList := tools.BuildSimpleCodeList(fullCodeMetaList, lenCodeLimit, noSimplifyChars)
 	
 	if !args.Quiet {
-		fmt.Printf("简码表生成完成，共 %d 项\n", len(simpleCodeList))
-		fmt.Println("开始写入文件...")
+		log.Printf("简码表生成完成，共 %d 项\n", len(simpleCodeList))
+		log.Println("开始写入文件...")
 	}
 
 	// 生成 preset_data.txt
 	if !args.Quiet {
-		fmt.Println("开始生成 preset_data.txt...")
+		log.Println("开始生成 preset_data.txt...")
 	}
 	presetDataLines, err := tools.BuildPresetData(simpleCodeList)
 	if err != nil {
 		log.Printf("生成 preset_data.txt 失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Printf("preset_data.txt 生成完成，共 %d 项\n", len(presetDataLines))
+		log.Printf("preset_data.txt 生成完成，共 %d 项\n", len(presetDataLines))
 	}
 
 	// 使用并行处理加速文件写入
@@ -221,7 +228,7 @@ func main() {
 		if err != nil {
 			errChan <- fmt.Errorf("写入FULLCHAR文件错误: %w", err)
 		} else if !args.Quiet {
-			fmt.Printf("FULLCHAR文件写入完成: %s\n", args.Full)
+			log.Printf("FULLCHAR文件写入完成: %s\n", args.Full)
 		}
 	}()
 
@@ -255,7 +262,7 @@ func main() {
 		if err != nil {
 			errChan <- fmt.Errorf("写入SIMPLECODE文件错误: %w", err)
 		} else if !args.Quiet {
-			fmt.Printf("SIMPLECODE文件写入完成: %s\n", args.Simple)
+			log.Printf("SIMPLECODE文件写入完成: %s\n", args.Simple)
 		}
 	}()
 
@@ -287,7 +294,7 @@ func main() {
 		if err != nil {
 			errChan <- fmt.Errorf("写入DIVISION文件错误: %w", err)
 		} else if !args.Quiet {
-			fmt.Printf("DIVISION文件写入完成: %s\n", args.Opencc)
+			log.Printf("DIVISION文件写入完成: %s\n", args.Opencc)
 		}
 	}()
 
@@ -320,7 +327,7 @@ func main() {
 		if err != nil {
 			errChan <- fmt.Errorf("写入DAZHUCHAI文件错误: %w", err)
 		} else if !args.Quiet {
-			fmt.Printf("DAZHUCHAI文件写入完成: %s\n", args.DazhuChai)
+			log.Printf("DAZHUCHAI文件写入完成: %s\n", args.DazhuChai)
 		}
 	}()
 
@@ -342,7 +349,7 @@ func main() {
 			if err != nil {
 				errChan <- fmt.Errorf("写入多字词全码表文件错误: %w", err)
 			} else if !args.Quiet {
-				fmt.Printf("多字词全码表文件写入完成: %s\n", args.WordsFull)
+				log.Printf("多字词全码表文件写入完成: %s\n", args.WordsFull)
 			}
 		}()
 	}
@@ -358,7 +365,7 @@ func main() {
 		if err != nil {
 			errChan <- fmt.Errorf("写入PRESETDATA文件错误: %w", err)
 		} else if !args.Quiet {
-			fmt.Printf("PRESETDATA文件写入完成: %s\n", args.PresetData)
+			log.Printf("PRESETDATA文件写入完成: %s\n", args.PresetData)
 		}
 	}()
 
@@ -385,7 +392,7 @@ func main() {
 			if err != nil {
 				errChan <- fmt.Errorf("写入多字词简码表文件错误: %w", err)
 			} else if !args.Quiet {
-				fmt.Printf("多字词简码表文件写入完成: %s\n", args.WordsSimple)
+				log.Printf("多字词简码表文件写入完成: %s\n", args.WordsSimple)
 			}
 		}()
 	}
@@ -401,32 +408,32 @@ func main() {
 
 	// 输出处理时间
 	if !args.Quiet {
-		fmt.Printf("处理完成，总耗时: %v\n", utils.Since(startTime))
+		log.Printf("处理完成，总耗时: %v\n", utils.Since(startTime))
 	}
 
-	// 处理citi文件
+	// 处理跟打词提
 	if args.ProcessCiti {
-		log.Println("开始处理citi文件...")
+		log.Println("开始处理跟打词提文件...")
 		err := tools.ProcessCitiFilesComplete(args.Simple, args.Full, args.WordsSimple, args.WordsFull, args.CitiPre, args.GendaCiti)
 		if err != nil {
-			log.Printf("处理citi文件失败: %v", err)
+			log.Printf("处理跟打词提文件失败: %v", err)
 		} else {
-			log.Println("citi文件处理完成")
+			log.Println("跟打词提文件处理完成")
 			
-			// 生成dazhu_code.txt
-			log.Println("开始生成dazhu_code.txt...")
+			// 生成大竹词提
+			log.Println("开始生成大竹词提...")
 			err := tools.CreateDazhuCode(args.GendaCiti, args.DazhuCode, 30)
 			if err != nil {
-				log.Printf("生成dazhu_code.txt失败: %v", err)
+				log.Printf("生成大竹词提失败: %v", err)
 			} else {
-				log.Println("dazhu_code.txt生成完成")
+				log.Println("大竹词提生成完成")
 			}
 		}
 	}
 
 	// 新增功能：将生成的文件追加到输出目录的字典文件
 	if !args.Quiet {
-		fmt.Println("开始将生成的文件追加到字典文件...")
+		log.Println("开始将生成的文件追加到字典文件...")
 	}
 	
 	// 获取输出目录
@@ -434,57 +441,68 @@ func main() {
 	
 	// 将div_ll.txt追加到LL_chaifen.dict.yaml
 	if !args.Quiet {
-		fmt.Println("将div_ll.txt追加到LL_chaifen.dict.yaml...")
+		log.Println("将div_ll.txt追加到LL_chaifen.dict.yaml...")
 	}
 	err = tools.AppendToDictFile(args.Opencc, filepath.Join(outputDir, "LL_chaifen.dict.yaml"), false, false)
 	if err != nil {
 		log.Printf("追加div_ll.txt到LL_chaifen.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Println("div_ll.txt追加到LL_chaifen.dict.yaml完成")
+		log.Println("div_ll.txt追加到LL_chaifen.dict.yaml完成")
 	}
 	
 	// 将code_chars_simp.txt追加到LL.chars.quick.dict.yaml（需要排序和删除词频）
 	if !args.Quiet {
-		fmt.Println("将code_chars_simp.txt追加到LL.chars.quick.dict.yaml...")
+		log.Println("将code_chars_simp.txt追加到LL.chars.quick.dict.yaml...")
 	}
 	err = tools.AppendToDictFile(args.Simple, filepath.Join(outputDir, "LL.chars.quick.dict.yaml"), true, true)
 	if err != nil {
 		log.Printf("追加code_chars_simp.txt到LL.chars.quick.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Println("code_chars_simp.txt追加到LL.chars.quick.dict.yaml完成")
+		log.Println("code_chars_simp.txt追加到LL.chars.quick.dict.yaml完成")
 	}
 	
 	// 将code_chars_full.txt追加到LL.chars.full.dict.yaml（需要排序和删除词频）
 	if !args.Quiet {
-		fmt.Println("将code_chars_full.txt追加到LL.chars.full.dict.yaml...")
+		log.Println("将code_chars_full.txt追加到LL.chars.full.dict.yaml...")
 	}
 	err = tools.AppendToDictFile(args.Full, filepath.Join(outputDir, "LL.chars.full.dict.yaml"), true, true)
 	if err != nil {
 		log.Printf("追加code_chars_full.txt到LL.chars.full.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Println("code_chars_full.txt追加到LL.chars.full.dict.yaml完成")
+		log.Println("code_chars_full.txt追加到LL.chars.full.dict.yaml完成")
 	}
 	
 	// 将code_words_simp.txt追加到LL.words.quick.dict.yaml（需要排序和删除词频）
 	if !args.Quiet {
-		fmt.Println("将code_words_simp.txt追加到LL.words.quick.dict.yaml...")
+		log.Println("将code_words_simp.txt追加到LL.words.quick.dict.yaml...")
 	}
 	err = tools.AppendToDictFile(args.WordsSimple, filepath.Join(outputDir, "LL.words.quick.dict.yaml"), true, true)
 	if err != nil {
 		log.Printf("追加code_words_simp.txt到LL.words.quick.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Println("code_words_simp.txt追加到LL.words.quick.dict.yaml完成")
+		log.Println("code_words_simp.txt追加到LL.words.quick.dict.yaml完成")
 	}
 	
 	// 将code_words_full.txt追加到LL.words.full.dict.yaml（需要排序和删除词频）
 	if !args.Quiet {
-		fmt.Println("将code_words_full.txt追加到LL.words.full.dict.yaml...")
+		log.Println("将code_words_full.txt追加到LL.words.full.dict.yaml...")
 	}
 	err = tools.AppendToDictFile(args.WordsFull, filepath.Join(outputDir, "LL.words.full.dict.yaml"), true, true)
 	if err != nil {
 		log.Printf("追加code_words_full.txt到LL.words.full.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
-		fmt.Println("code_words_full.txt追加到LL.words.full.dict.yaml完成")
+		log.Println("code_words_full.txt追加到LL.words.full.dict.yaml完成")
+	}
+	
+	// 生成字根码表并追加到LL.roots.dict.yaml
+	if !args.Quiet {
+		log.Println("开始生成字根码表...")
+	}
+	err = tools.GenerateRootsDict(args.Map, args.RootsDict)
+	if err != nil {
+		log.Printf("生成字根码表失败: %v", err)
+	} else if !args.Quiet {
+		log.Printf("字根码表生成完成: %s\n", args.RootsDict)
 	}
 }
 
@@ -496,4 +514,12 @@ func ensureOutputDir(path string) {
 			log.Fatalf("无法创建目录 %s: %v", dir, err)
 		}
 	}
+}
+
+// logWriter 自定义日志写入器，格式与Shell脚本保持一致
+type logWriter struct{}
+
+func (writer logWriter) Write(bytes []byte) (int, error) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	return fmt.Printf("[%s] %s", timestamp, string(bytes))
 }

@@ -48,7 +48,6 @@ encoder:
 又	]/sr
 	]/sr
 龴	]/sr
-	]/sr
 	]/sr
 一	].ar
 土	]npw
@@ -112,8 +111,8 @@ encoder:
 ⺀	]dju
 	]dju
 	]dju
-	]dju
 𘡂	]dju
+	]dju
 𘬀	]dju
 󲻝	]dju
 𰀪	]dju
@@ -177,7 +176,7 @@ encoder:
 	]y;u
 门	]d,r
 戈	]far
-戈无一	]far
+{戈无一}	]far
 	]far
 兴	]bzo
 	]bzo
@@ -262,7 +261,6 @@ encoder:
 	]jyr
 	]jyr
 ⺶	]jyr
-儿	]gyo
 耳	]vpu
 见	]hlw
 生	]glu
@@ -291,6 +289,7 @@ encoder:
 	]kqo
 里	]jzw
 者	]ngo
+儿	]gyo
 矢	],cw
 用	]jto
 	]jto
@@ -343,6 +342,7 @@ encoder:
 糸	]hqr
 幺	]hqr
 ⺯	]hqr
+糹	]hqr
 马	]bjw
 	]bjw
 片	]fkr
@@ -357,6 +357,10 @@ encoder:
 廴	]alr
 各	]dxo
 本	]hxo
+	]fsw
+	]fsw
+	]fsw
+	]fsw
 京	]hgo
 果	]hdr
 更	]fqu
@@ -378,6 +382,7 @@ encoder:
 	]mtr
 龰	]mtr
 	]mtr
+	]mtr
 雨	]lpu
 	]lpu
 弓	]jpw
@@ -410,7 +415,7 @@ encoder:
 	]ygu
 龸	]ygu
 万	],/r
-成三	],/r
+{成三}	],/r
 壬	]g;u
 𡈼	]g;u
 豕	].lr
@@ -433,10 +438,6 @@ encoder:
 元	]qfu
 音	]bsw
 󲨣	]bsw
-	]fsw
-	]fsw
-	]fsw
-	]fsw
 出	]qpr
 巴	]aco
 业	]smr
@@ -446,6 +447,7 @@ encoder:
 	]pxu
 󰂗	]pxu
 󰂘	]pxu
+⾼	]pxu
 玉	]cno
 古	]kqr
 祭	]t/w
@@ -453,6 +455,7 @@ encoder:
 	]t/w
 癶	]t/w
 	]t/w
+	]t/w
 分	]s,w
 交	]kvr
 走	].gw
@@ -620,6 +623,7 @@ encoder:
 另	]smu
 谷	]vcw
 	]vcw
+⾕	]vcw
 酉	]apr
 予	],,r
 爻	]yxo
@@ -648,6 +652,9 @@ encoder:
 	]/gu
 亦	]aau
 	]aau
+兔	]kgr
+	]kgr
+	]kgr
 三	]z/r
 员	]nnw
 舟	],lu
@@ -668,6 +675,7 @@ encoder:
 老	]dpw
 虎	].du
 虍	].du
+𮓗	].du
 	].du
 九	]//w
 已	]zmw
@@ -707,9 +715,9 @@ encoder:
 	]bxr
 缶	]ksr
 	]ksr
-	]dyr
 民	]kfu
 林	]fyr
+𣏟	]fyr
 壴	]npo
 风	]yto
 圭	]mzo
@@ -736,7 +744,7 @@ encoder:
 	].su
 	].su
 釆	]dfu
-温字框	]..w
+{温字框}	]..w
 甫	]kfw
 	]kfw
 卯	]aqw
@@ -761,6 +769,7 @@ encoder:
 	]cvu
 黑	]lmr
 黒	]lmr
+⿊	]lmr
 	]cfw
 齐	]lfo
 斉	]lfo
@@ -807,6 +816,7 @@ encoder:
 叚	]nlw
 屯	]ypw
 	]ypw
+	]ypw
 	]ypw
 骨	],vr
 咼	],vr
@@ -873,15 +883,16 @@ encoder:
 㡀	]fpr
 門	]bko
 鬥	]bko
+⾾	]bko
 	]fqu
-兔	]kgr
-	]kgr
 丹	]cvw
 頁	]t/o
+⾴	]t/o
 󰯷	]t/o
 鹿	];fo
 	];fo
 	];fo
+⿅	];fo
 卵	]yfu
 黾	]jpo
 	]yyu
@@ -919,8 +930,10 @@ encoder:
 	]zjr
 	]zjr
 麥	].jo
+⿆	].jo
 	]kxu
 	]kxu
+	]dyr
 亾	].dw
 兦	].dw
 丄	];to

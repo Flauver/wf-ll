@@ -1122,3 +1122,61 @@ func BuildPresetData(simpleCodeList []*types.CharMeta) ([]string, error) {
 
 	return outputLines, nil
 }
+
+// GenerateRootsDict 根据ll_map.txt生成字根码表并追加到LL.roots.dict.yaml
+// llMapFile: ll_map.txt文件路径，格式为"字根编码\t字根"
+// rootsDictFile: LL.roots.dict.yaml文件路径
+func GenerateRootsDict(llMapFile, rootsDictFile string) error {
+	// 读取ll_map.txt文件
+	file, err := os.Open(llMapFile)
+	if err != nil {
+		return fmt.Errorf("读取ll_map.txt文件失败: %w", err)
+	}
+	defer file.Close()
+
+	// 解析ll_map.txt内容
+	var rootsEntries []*DictEntry
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		// 格式为"字根编码\t字根"
+		fields := strings.Split(line, "\t")
+		if len(fields) < 2 {
+			continue
+		}
+
+		code := fields[0]
+		root := fields[1]
+
+		// 转换为"字根\t\]字根编码"格式
+		transformedCode := "]" + code
+		
+		rootsEntries = append(rootsEntries, &DictEntry{
+			Text: root,
+			Code: transformedCode,
+			Freq: 0, // 字根没有词频
+		})
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("扫描ll_map.txt文件失败: %w", err)
+	}
+
+	// 构建要追加的内容，保持ll_map.txt的原始顺序
+	var contentToAppend strings.Builder
+	for _, entry := range rootsEntries {
+		contentToAppend.WriteString(fmt.Sprintf("%s\t%s\n", entry.Text, entry.Code))
+	}
+
+	// 追加到目标文件
+	err = appendToFile(rootsDictFile, contentToAppend.String())
+	if err != nil {
+		return fmt.Errorf("追加到LL.roots.dict.yaml失败: %w", err)
+	}
+
+	return nil
+}
