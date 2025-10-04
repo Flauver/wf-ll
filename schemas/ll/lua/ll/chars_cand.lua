@@ -1,5 +1,20 @@
--- Character Tips Module for Rime Input Method
--- High-performance character hint system with efficient data management
+--[[
+Name: chars_cand.lua
+Version: 20251005
+Author: 荒
+Purpose: Character Candidate Module for Rime Input Method
+License: 
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
+
+Usage:
+(1) Place this lua file in the lua directory
+(2) Add to engine/processors:
+    - lua_processor@chars_cand
+(3) Add switch to switches:
+    - name: chars_cand
+      states: [ 字候选关, 字候选开 ]
+      reset: 1 
+]]
 
 -- ==================== CONFIGURATION CONSTANTS ====================
 local DB_KEY_PREFIX = string.char(1) .. "config/"

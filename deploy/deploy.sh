@@ -110,6 +110,7 @@ gen_schema() {
     log "打包发布文件..."
     pushd "${SCHEMAS}" || error "无法切换到发布目录"
         tar -cf - \
+            --exclude="build" \
             --exclude="*userdb" \
             --exclude="sync" \
             --exclude="*.custom.yaml" \
@@ -126,6 +127,7 @@ gen_schema() {
             || error "打包失败"
         log "打包仓输入法包..."
         (cd "./ll" && zip -9 -r -q "../releases/${NAME}-${REF_NAME}.zip" . \
+            -x "build/**" \
             -x "*userdb*" \
             -x "sync/**" \
             -x "*.custom.yaml" \
