@@ -99,8 +99,8 @@ local function charset_filter(input, env)
     -- Preload common character set
     local commonCharacterTable = createCharacterSet(commonCharacterSet)
     
-    -- Bypass filter if input starts with '`'
-    if env.engine.context.input:match("^[`]") then
+    -- Bypass filter if input starts with ']'
+    if env.engine.context.input:match("^%]") then
         for candidate in input:iter() do
             yield(candidate)
         end
