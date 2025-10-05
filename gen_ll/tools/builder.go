@@ -568,11 +568,202 @@ func BuildWordsSimpleCode(wordCodes []*types.WordCode, lenCodeLimit map[int]int)
 		}
 	}
 
+	// 先排序
+	SortWordSimpleCodes(resultData)
+
+	// 然后在排序后的结果中添加占位符
+	resultData = addPlaceholdersAfterSort(resultData, lenCodeLimit)
+
 	return resultData
 }
 
+// addPlaceholdersAfterSort 在排序后为多字词简码添加占位符
+func addPlaceholdersAfterSort(wordSimpleCodes []*types.WordSimpleCode, lenCodeLimit map[int]int) []*types.WordSimpleCode {
+	result := make([]*types.WordSimpleCode, 0, len(wordSimpleCodes))
+
+	// 按编码分组处理
+	currentGroup := make([]*types.WordSimpleCode, 0)
+	var currentCode string
+
+	for _, item := range wordSimpleCodes {
+		if item.Code != currentCode {
+			// 处理前一个组
+			if len(currentGroup) > 0 {
+				result = append(result, currentGroup...)
+				// 为前一个组添加占位符
+				result = appendGroupPlaceholders(result, currentGroup, lenCodeLimit)
+			}
+			// 开始新组
+			currentGroup = []*types.WordSimpleCode{item}
+			currentCode = item.Code
+		} else {
+			// 添加到当前组
+			currentGroup = append(currentGroup, item)
+		}
+	}
+
+	// 处理最后一个组
+	if len(currentGroup) > 0 {
+		result = append(result, currentGroup...)
+		// 为最后一个组添加占位符
+		result = appendGroupPlaceholders(result, currentGroup, lenCodeLimit)
+	}
+
+	// 为所有可能的基础编码添加占位符（包括空码位）
+	result = addAllPossiblePlaceholders(result, lenCodeLimit)
+
+	return result
+}
+
+// appendGroupPlaceholders 为单个编码组添加占位符
+func appendGroupPlaceholders(result []*types.WordSimpleCode, group []*types.WordSimpleCode, lenCodeLimit map[int]int) []*types.WordSimpleCode {
+	if len(group) == 0 {
+		return result
+	}
+
+	// 获取编码长度
+	codeLength := len(group[0].Code)
+	limit := lenCodeLimit[codeLength]
+	if limit == 0 {
+		return result
+	}
+
+	// 如果当前组数量小于限制，添加占位符
+	if len(group) < limit {
+		startIndex := len(group) + 1
+		count := limit - len(group)
+		placeholders := generatePlaceholders(startIndex, count, limit)
+		for _, placeholder := range placeholders {
+			// 使用硬编码的占位符权重
+			weight := getPlaceholderWeight(placeholder)
+			result = append(result, &types.WordSimpleCode{
+				Word:   placeholder,
+				Code:   group[0].Code,
+				Weight: weight,
+			})
+		}
+	}
+
+	return result
+}
+
+// addAllPossiblePlaceholders 为所有可能的基础编码添加占位符（包括空码位）
+func addAllPossiblePlaceholders(wordSimpleCodes []*types.WordSimpleCode, lenCodeLimit map[int]int) []*types.WordSimpleCode {
+	result := make([]*types.WordSimpleCode, len(wordSimpleCodes))
+	copy(result, wordSimpleCodes)
+
+	// 为每个简码长度和基础简码添加占位符
+	for codeLength := 1; codeLength <= 3; codeLength++ {
+		limit := lenCodeLimit[codeLength]
+		if limit == 0 {
+			continue
+		}
+
+		// 获取该长度所有可能的基础简码
+		allBaseCodes := generateAllBaseCodes(codeLength)
+		
+		for _, baseCode := range allBaseCodes {
+			// 检查该基础编码是否已经有实际词
+			hasActualWord := false
+			for _, item := range wordSimpleCodes {
+				if item.Code == baseCode && !isPlaceholder(item.Word) {
+					hasActualWord = true
+					break
+				}
+			}
+			
+			// 如果没有实际词，需要添加完整的占位符
+			if !hasActualWord {
+				placeholders := generatePlaceholders(1, limit, limit)
+				for _, placeholder := range placeholders {
+					// 使用硬编码的占位符权重
+					weight := getPlaceholderWeight(placeholder)
+					result = append(result, &types.WordSimpleCode{
+						Word:   placeholder,
+						Code:   baseCode,
+						Weight: weight,
+					})
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+// addPlaceholders 为多字词简码添加占位符
+func addPlaceholders(wordSimpleCodes []*types.WordSimpleCode, codeCounters map[int]map[string]int, lenCodeLimit map[int]int) []*types.WordSimpleCode {
+	result := make([]*types.WordSimpleCode, len(wordSimpleCodes))
+	copy(result, wordSimpleCodes)
+
+	// 为每个简码长度和基础简码添加占位符
+	for codeLength := 1; codeLength <= 3; codeLength++ {
+		limit := lenCodeLimit[codeLength]
+		if limit == 0 {
+			continue
+		}
+
+		// 获取该长度所有可能的基础简码
+		allBaseCodes := generateAllBaseCodes(codeLength)
+		
+		for _, baseCode := range allBaseCodes {
+			currentCount := codeCounters[codeLength][baseCode]
+			
+			// 如果当前数量小于限制，需要添加占位符
+			if currentCount < limit {
+				// 占位符从当前数量+1开始编号
+				startIndex := currentCount + 1
+				count := limit - currentCount
+				placeholders := generatePlaceholders(startIndex, count, limit)
+				for _, placeholder := range placeholders {
+					result = append(result, &types.WordSimpleCode{
+						Word:   placeholder,
+						Code:   baseCode,
+						Weight: "0", // 占位符权重设为0
+					})
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+// generateAllBaseCodes 生成所有可能的基础简码组合
+func generateAllBaseCodes(codeLength int) []string {
+	// 24个键：qtypasdfghjkl;zxcvbnm,./
+	keys := []string{"q", "t", "y", "p", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"}
+	
+	if codeLength == 1 {
+		return keys
+	}
+	
+	// 生成所有可能的组合
+	var result []string
+	switch codeLength {
+	case 2:
+		for _, first := range keys {
+			for _, second := range keys {
+				result = append(result, first+second)
+			}
+		}
+	case 3:
+		for _, first := range keys {
+			for _, second := range keys {
+				for _, third := range keys {
+					result = append(result, first+second+third)
+				}
+			}
+		}
+	default:
+		return nil
+	}
+	
+	return result
+}
+
 // SortWordSimpleCodes 对多字词简码进行排序
-// 排序规则：先按编码升序排列，编码相同时按权重降序排列
+// 排序规则：先按编码升序排列，编码相同时按权重降序排列，占位符排在正常词后面
 func SortWordSimpleCodes(wordSimpleCodes []*types.WordSimpleCode) {
 	sort.Slice(wordSimpleCodes, func(i, j int) bool {
 		a, b := wordSimpleCodes[i], wordSimpleCodes[j]
@@ -582,7 +773,21 @@ func SortWordSimpleCodes(wordSimpleCodes []*types.WordSimpleCode) {
 			return a.Code < b.Code
 		}
 
-		// 编码相同，按权重降序排列
+		// 编码相同，检查是否为占位符
+		aIsPlaceholder := isPlaceholder(a.Word)
+		bIsPlaceholder := isPlaceholder(b.Word)
+		
+		// 占位符排在正常词后面
+		if aIsPlaceholder != bIsPlaceholder {
+			return !aIsPlaceholder // 如果a不是占位符而b是占位符，a排在前面
+		}
+
+		// 如果都是占位符，按占位符编号升序排列
+		if aIsPlaceholder && bIsPlaceholder {
+			return getPlaceholderIndex(a.Word) < getPlaceholderIndex(b.Word)
+		}
+
+		// 都是正常词，按权重降序排列
 		weightA := parseWeight(a.Weight)
 		weightB := parseWeight(b.Weight)
 
@@ -593,6 +798,49 @@ func SortWordSimpleCodes(wordSimpleCodes []*types.WordSimpleCode) {
 		// 编码和权重都相同，按词语Unicode编码升序排列（保持稳定排序）
 		return a.Word < b.Word
 	})
+}
+
+// isPlaceholder 检查是否为占位符
+func isPlaceholder(word string) bool {
+	// 占位符是①、②、③、④等字符
+	if len(word) == 1 {
+		r := rune(word[0])
+		return r >= '①' && r <= '⑩'
+	}
+	return false
+}
+
+// getPlaceholderIndex 获取占位符的编号（①=1, ②=2, ...）
+func getPlaceholderIndex(word string) int {
+	if !isPlaceholder(word) {
+		return 0
+	}
+	r := rune(word[0])
+	return int(r - '①' + 1)
+}
+
+// getPlaceholderWeight 获取占位符的硬编码权重
+func getPlaceholderWeight(word string) string {
+	// 硬编码占位符权重映射表
+	weightMap := map[string]string{
+		"①": "-1",
+		"②": "-2",
+		"③": "-3",
+		"④": "-4",
+		"⑤": "-5",
+		"⑥": "-6",
+		"⑦": "-7",
+		"⑧": "-8",
+		"⑨": "-9",
+		"⑩": "-10",
+	}
+	
+	if weight, exists := weightMap[word]; exists {
+		return weight
+	}
+	
+	// 对于未知占位符，返回默认值
+	return "-0"
 }
 
 // DictEntry 表示字典条目
@@ -1179,4 +1427,62 @@ func GenerateRootsDict(llMapFile, rootsDictFile string) error {
 	}
 
 	return nil
+}
+
+// generatePlaceholders 生成占位符
+// startIndex: 占位符起始编号（从1开始）
+// count: 需要生成的占位符数量
+// maxLimit: 该简码长度的最大限制数
+func generatePlaceholders(startIndex, count, maxLimit int) []string {
+	if count <= 0 || startIndex > maxLimit {
+		return nil
+	}
+	
+	// 根据最大限制数确定占位符字符集
+	var placeholders []string
+	switch maxLimit {
+	case 1:
+		placeholders = []string{"①"}
+	case 2:
+		placeholders = []string{"①", "②"}
+	case 3:
+		placeholders = []string{"①", "②", "③"}
+	case 4:
+		placeholders = []string{"①", "②", "③", "④"}
+	case 5:
+		placeholders = []string{"①", "②", "③", "④", "⑤"}
+	case 6:
+		placeholders = []string{"①", "②", "③", "④", "⑤", "⑥"}
+	case 7:
+		placeholders = []string{"①", "②", "③", "④", "⑤", "⑥", "⑦"}
+	case 8:
+		placeholders = []string{"①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧"}
+	case 9:
+		placeholders = []string{"①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨"}
+	case 10:
+		placeholders = []string{"①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩"}
+	default:
+		// 对于超过10的情况，使用数字加括号
+		placeholders = make([]string, maxLimit)
+		for i := 0; i < maxLimit; i++ {
+			placeholders[i] = fmt.Sprintf("(%d)", i+1)
+		}
+	}
+	
+	// 从startIndex开始取count个占位符
+	if startIndex > len(placeholders) {
+		return nil
+	}
+	
+	endIndex := startIndex + count - 1
+	if endIndex > len(placeholders) {
+		endIndex = len(placeholders)
+		count = endIndex - startIndex + 1
+	}
+	
+	if count <= 0 {
+		return nil
+	}
+	
+	return placeholders[startIndex-1 : startIndex-1+count]
 }

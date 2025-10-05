@@ -417,13 +417,19 @@ func main() {
 		} else {
 			log.Println("跟打词提文件处理完成")
 			
-			// 生成大竹词提
+			// 生成大竹词提（使用专用版本，不使用后缀）
 			log.Println("开始生成大竹词提...")
-			err := tools.CreateDazhuCode(args.GendaCiti, args.DazhuCode, 30)
+			gendaCitiForDazhu := args.GendaCiti + ".dazhu"
+			err := tools.ProcessCitiFilesCompleteForDazhu(args.Simple, args.Full, args.WordsSimple, args.WordsFull, args.CitiPre, gendaCitiForDazhu)
 			if err != nil {
 				log.Printf("生成大竹词提失败: %v", err)
 			} else {
-				log.Println("大竹词提生成完成")
+				err := tools.CreateDazhuCode(gendaCitiForDazhu, args.DazhuCode, 30)
+				if err != nil {
+					log.Printf("生成大竹词提失败: %v", err)
+				} else {
+					log.Println("大竹词提生成完成")
+				}
 			}
 		}
 	}

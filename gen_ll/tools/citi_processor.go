@@ -324,6 +324,59 @@ func AddCandidateCodes(entries []*CitiEntry) []*CitiEntry {
 	return finalResult
 }
 
+// AddCandidateCodesForDazhu 为重复编码添加候选码（大竹专用版本，不使用后缀）
+func AddCandidateCodesForDazhu(entries []*CitiEntry) []*CitiEntry {
+	// 按编码分组，但记录每个条目的原始位置
+	type entryWithIndex struct {
+		entry *CitiEntry
+		index int
+	}
+	codeGroups := make(map[string][]*entryWithIndex)
+	
+	for i, entry := range entries {
+		codeGroups[entry.Code] = append(codeGroups[entry.Code], &entryWithIndex{entry, i})
+	}
+
+	// 创建结果数组，保持原始顺序
+	result := make([]*CitiEntry, len(entries))
+
+	// 处理每个编码的重码情况
+	for code, group := range codeGroups {
+		if len(group) == 1 {
+			// 没有重码，直接使用原编码
+			result[group[0].index] = group[0].entry
+			continue
+		}
+
+		// 有重码，按词频排序（保持词频排序）
+		sort.Slice(group, func(i, j int) bool {
+			return group[i].entry.Freq > group[j].entry.Freq
+		})
+
+		// 为每个候选使用原编码，不添加任何后缀
+		// 避免生成类似 _ei[237890 的后缀
+		for _, ew := range group {
+			newEntry := &CitiEntry{
+				Text:   ew.entry.Text,
+				Code:   code, // 直接使用原编码，不添加后缀
+				Freq:   ew.entry.Freq,
+				Source: ew.entry.Source,
+			}
+			result[ew.index] = newEntry
+		}
+	}
+
+	// 移除可能为nil的条目（理论上不应该有）
+	finalResult := make([]*CitiEntry, 0, len(entries))
+	for _, entry := range result {
+		if entry != nil {
+			finalResult = append(finalResult, entry)
+		}
+	}
+
+	return finalResult
+}
+
 // ProcessCitiFilesComplete 完整的citi文件处理流程
 func ProcessCitiFilesComplete(charsSimpFile, charsFullFile, wordsSimpFile, wordsFullFile, citiPreFile, gendaCitiFile string) error {
 	// 按照指定顺序分别处理每个来源，保持各自原始排序
@@ -413,6 +466,57 @@ func CreateDazhuCode(gendaCitiFile, dazhuCodeFile string, maxSizeMB int) error {
 
 	if err := writer.Flush(); err != nil {
 		return fmt.Errorf("刷新文件失败: %w", err)
+	}
+
+	return nil
+}
+// ProcessCitiFilesCompleteForDazhu 完整的citi文件处理流程（大竹专用版本，不使用后缀）
+func ProcessCitiFilesCompleteForDazhu(charsSimpFile, charsFullFile, wordsSimpFile, wordsFullFile, citiPreFile, gendaCitiFile string) error {
+	// 按照指定顺序分别处理每个来源，保持各自原始排序
+	var allEntries []*CitiEntry
+
+	// 1. 首先处理ll_citi_pre.txt - 不进行重码处理，保持原有顺序
+	citiPreEntries, err := ReadCitiFile(citiPreFile, "citi_pre")
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("读取ll_citi_pre.txt失败: %w", err)
+	}
+	// ll_citi_pre.txt已经包含候选编码补码，直接使用
+	allEntries = append(allEntries, citiPreEntries...)
+
+	// 2. 然后处理code_chars_simp.txt - 不需要运用补码规则，直接使用
+	charsSimpEntries, err := ReadCitiFile(charsSimpFile, "chars_simp")
+	if err != nil {
+		return fmt.Errorf("读取code_chars_simp.txt失败: %w", err)
+	}
+	allEntries = append(allEntries, charsSimpEntries...)
+
+	// 3. 接着处理code_chars_full.txt - 需要运用补码规则（大竹专用版本）
+	charsFullEntries, err := ReadCitiFile(charsFullFile, "chars_full")
+	if err != nil {
+		return fmt.Errorf("读取code_chars_full.txt失败: %w", err)
+	}
+	charsFullWithCandidates := AddCandidateCodesForDazhu(charsFullEntries)
+	allEntries = append(allEntries, charsFullWithCandidates...)
+
+	// 4. 然后处理code_words_simp.txt - 需要运用补码规则（大竹专用版本）
+	wordsSimpEntries, err := ReadCitiFile(wordsSimpFile, "words_simp")
+	if err != nil {
+		return fmt.Errorf("读取code_words_simp.txt失败: %w", err)
+	}
+	wordsSimpWithCandidates := AddCandidateCodesForDazhu(wordsSimpEntries)
+	allEntries = append(allEntries, wordsSimpWithCandidates...)
+
+	// 5. 最后处理code_words_full.txt - 需要运用补码规则（大竹专用版本）
+	wordsFullEntries, err := ReadCitiFile(wordsFullFile, "words_full")
+	if err != nil {
+		return fmt.Errorf("读取code_words_full.txt失败: %w", err)
+	}
+	wordsFullWithCandidates := AddCandidateCodesForDazhu(wordsFullEntries)
+	allEntries = append(allEntries, wordsFullWithCandidates...)
+
+	// 创建genda_citi.txt并删除词频
+	if err := CreateGendaCiti(allEntries, gendaCitiFile); err != nil {
+		return fmt.Errorf("创建genda_citi.txt失败: %w", err)
 	}
 
 	return nil
