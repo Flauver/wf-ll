@@ -74,7 +74,7 @@ gen_schema() {
         cp -r "${NAME}"/*.txt "${LL}"
     fi
 
-    log "生成离乱码表..."
+    log "生成${NAME}码表..."
     ./gen_ll -q \
         -d "${LL}/ll_div.txt" \
         -m "${LL}/ll_map.txt" \
@@ -94,7 +94,7 @@ gen_schema() {
         -z "${LL}/大竹_code.txt" \
         -P "${LL}/lua/chars_cand/preset_data.txt" \
         -R "${LL}/LL.roots.dict.yaml" \
-        || error "生成离乱码表失败"
+        || error "生成${NAME}码表失败"
 
     log "准备生成Rime方案..."
     rsync -a --exclude='/code_*.txt' \
@@ -108,7 +108,7 @@ gen_schema() {
 
     # 打包发布
     log "打包发布文件..."
-    pushd "${SCHEMAS}" || error "无法切换到发布目录"
+    (cd "${SCHEMAS}" || error "无法切换到发布目录"
         tar -cf - \
             --exclude="build" \
             --exclude="*userdb" \
@@ -139,11 +139,12 @@ gen_schema() {
             -x "大竹*.txt" \
             -x "跟打词提.txt" \
             -x "speed_stats.conf") || error "仓输入法包打包失败"
-    popd
+    )
     log "方案 ${NAME} 生成完成"
 }
 
 # 主程序
-log "开始部署离乱输入法..."
-gen_schema 离乱 || error "生成离乱方案失败"
-log "部署完成"
+NAME="离乱"
+log "开始构建${NAME}方案..."
+gen_schema "${NAME}" || error "生成${NAME}方案失败"
+log "${NAME}方案构建完成"

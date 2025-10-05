@@ -298,10 +298,9 @@ func main() {
 		}
 	}()
 
-	// DAZHUCHAI - 大竹拆文件，格式为三行：
+	// DAZHUCHAI - 大竹拆文件，格式为两行：
 	// 第一行："部件\t字"（将 Division.Divs 连接成字符串）
-	// 第二行："Unicode类别\t字"（使用 Division.Set）
-	// 第三行："Unicode编码\t字"（使用 Division.Unicode）
+	// 第二行："Unicode类别〔Unicode编码〕\t字"（将第二行和第三行整合）
 	go func() {
 		defer wg.Done()
 		buffer := bytes.Buffer{}
@@ -318,10 +317,8 @@ func main() {
 			// 第一行：部件\t字
 			components := strings.Join(charMeta.Division.Divs, "")
 			buffer.WriteString(fmt.Sprintf("%s\t%s\n", components, charMeta.Char))
-			// 第二行：Unicode类别\t字
-			buffer.WriteString(fmt.Sprintf("%s\t%s\n", charMeta.Division.Set, charMeta.Char))
-			// 第三行：Unicode编码\t字
-			buffer.WriteString(fmt.Sprintf("%s\t%s\n", charMeta.Division.Unicode, charMeta.Char))
+			// 第二行：Unicode类别〔Unicode编码〕\t字（整合第二行和第三行）
+			buffer.WriteString(fmt.Sprintf("%s〔%s〕\t%s\n", charMeta.Division.Set, charMeta.Division.Unicode, charMeta.Char))
 		}
 		err := os.WriteFile(args.DazhuChai, buffer.Bytes(), 0o644)
 		if err != nil {
