@@ -1275,9 +1275,16 @@ encoder:
 `, description, name)
 }
 
-// BuildPresetData 根据单字简码表生成 preset_data.txt
-func BuildPresetData(simpleCodeList []*types.CharMeta) ([]string, error) {
-	// 按前缀分组
+// BuildPresetData 根据单字简码表和全码表生成 preset_data.txt
+func BuildPresetData(simpleCodeList []*types.CharMeta, fullCodeMetaList []*types.CharMeta) ([]string, error) {
+	// 创建全码字符映射，用于查找三码组合对应的实际字符
+	fullCodeMap := make(map[string][]*types.CharMeta)
+	for _, charMeta := range fullCodeMetaList {
+		// 使用全码作为键
+		fullCodeMap[charMeta.Code] = append(fullCodeMap[charMeta.Code], charMeta)
+	}
+	
+	// 按前缀分组（使用简码表）
 	prefixGroups := make(map[string][]*types.CharMeta)
 	
 	for _, charMeta := range simpleCodeList {
@@ -1357,6 +1364,9 @@ func BuildPresetData(simpleCodeList []*types.CharMeta) ([]string, error) {
 		outputLines = append(outputLines, outputLine)
 	}
 	
+	// 添加三码组合（",,,~zzz"）的13824个组合
+	outputLines = append(outputLines, generateThreeCodeCombinations(fullCodeMap)...)
+	
 	// 按编码（code）升序排列
 	sort.Slice(outputLines, func(i, j int) bool {
 		// 提取每行的编码部分（制表符后的内容）
@@ -1369,6 +1379,67 @@ func BuildPresetData(simpleCodeList []*types.CharMeta) ([]string, error) {
 	})
 
 	return outputLines, nil
+}
+
+// generateThreeCodeCombinations 生成三码组合的数据，使用实际字符或占位符
+func generateThreeCodeCombinations(fullCodeMap map[string][]*types.CharMeta) []string {
+	// 24个键：qtypasdfghjkl;zxcvbnm,./
+	keys := []string{"q", "t", "y", "p", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"}
+	
+	outputLines := make([]string, 0, 24*24*24) // 13824个组合
+	
+	// 生成所有三码组合
+	for _, first := range keys {
+		for _, second := range keys {
+			for _, third := range keys {
+				prefix := first + second + third
+				
+				// 查找对应四个后缀的实际字符
+				wChar := findCharForCode(fullCodeMap, prefix+"w")
+				rChar := findCharForCode(fullCodeMap, prefix+"r")
+				uChar := findCharForCode(fullCodeMap, prefix+"u")
+				oChar := findCharForCode(fullCodeMap, prefix+"o")
+				
+				// 构建候选项
+				candidates := make([]string, 0, 4)
+				if wChar != "" {
+					candidates = append(candidates, "w"+wChar)
+				} else {
+					candidates = append(candidates, "w①")
+				}
+				if rChar != "" {
+					candidates = append(candidates, "r"+rChar)
+				} else {
+					candidates = append(candidates, "r②")
+				}
+				if uChar != "" {
+					candidates = append(candidates, "u"+uChar)
+				} else {
+					candidates = append(candidates, "u③")
+				}
+				if oChar != "" {
+					candidates = append(candidates, "o"+oChar)
+				} else {
+					candidates = append(candidates, "o④")
+				}
+				
+				candidateStr := strings.Join(candidates, " ")
+				outputLine := candidateStr + "\t" + prefix
+				outputLines = append(outputLines, outputLine)
+			}
+		}
+	}
+	
+	return outputLines
+}
+
+// findCharForCode 在全码映射中查找对应编码的字符
+func findCharForCode(fullCodeMap map[string][]*types.CharMeta, code string) string {
+	if chars, exists := fullCodeMap[code]; exists && len(chars) > 0 {
+		// 返回第一个字符（通常是词频最高的）
+		return chars[0].Char
+	}
+	return ""
 }
 
 // GenerateRootsDict 根据ll_map.txt生成字根码表并追加到LL.roots.dict.yaml

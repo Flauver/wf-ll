@@ -197,7 +197,7 @@ func main() {
 	if !args.Quiet {
 		log.Println("开始生成 preset_data.txt...")
 	}
-	presetDataLines, err := tools.BuildPresetData(simpleCodeList)
+	presetDataLines, err := tools.BuildPresetData(simpleCodeList, fullCodeMetaList)
 	if err != nil {
 		log.Printf("生成 preset_data.txt 失败: %v", err)
 	} else if !args.Quiet {
@@ -417,19 +417,13 @@ func main() {
 		} else {
 			log.Println("跟打词提文件处理完成")
 			
-			// 生成大竹词提（使用专用版本，不使用后缀）
+			// 生成大竹词提
 			log.Println("开始生成大竹词提...")
-			gendaCitiForDazhu := args.GendaCiti + ".dazhu"
-			err := tools.ProcessCitiFilesCompleteForDazhu(args.Simple, args.Full, args.WordsSimple, args.WordsFull, args.CitiPre, gendaCitiForDazhu)
+			err := tools.CreateDazhuCode(args.GendaCiti, args.DazhuCode, 30)
 			if err != nil {
 				log.Printf("生成大竹词提失败: %v", err)
 			} else {
-				err := tools.CreateDazhuCode(gendaCitiForDazhu, args.DazhuCode, 30)
-				if err != nil {
-					log.Printf("生成大竹词提失败: %v", err)
-				} else {
-					log.Println("大竹词提生成完成")
-				}
+				log.Println("大竹词提生成完成")
 			}
 		}
 	}
