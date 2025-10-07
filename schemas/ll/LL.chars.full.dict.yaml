@@ -12271,7 +12271,6 @@ encoder:
 𭼖	/jhw
 𳆔	/jhw
 𬫇	/jjo
-𳅩	/jjo
 銢	/jjr
 𢑨	/jjr
 𬖁	/jjr
@@ -44290,6 +44289,7 @@ encoder:
 㛥	gjhw
 𨆮	gjhw
 𮛼	gjhw
+𳅩	gjjo
 𡡂	gjjr
 𡡺	gjjr
 𨄶	gjjr
@@ -67827,7 +67827,6 @@ encoder:
 𡓕	n/.w
 𢮙	n/.w
 𫾙	n/.w
-𲙺	n/.w
 埐	n//r
 㧞	n//r
 𡎹	n//r
@@ -67955,7 +67954,6 @@ encoder:
 𧒕	n/ju
 𡓯	n/jw
 𢴈	n/jw
-𳇶	n/jw
 𫨵	n/kr
 撘	n/kw
 㙮	n/kw
@@ -69976,6 +69974,7 @@ encoder:
 𢭵	ng.w
 𢳾	ng.w
 𪔷	ng.w
+𲙺	ng.w
 𲡚	ng.w
 扳	ng/r
 坂	ng/r
@@ -70077,6 +70076,7 @@ encoder:
 𨲦	ngjw
 𫮈	ngjw
 𲡼	ngjw
+𳇶	ngjw
 𢯐	ngkr
 𪔐	ngkr
 𪔕	ngkr
@@ -95639,7 +95639,6 @@ encoder:
 𭇳	x/zu
 𭊗	x/zu
 𰈱	x/zu
-𲟫	x/zu
 𥙢	x;,r
 𭊨	x;,r
 𮋙	x;,r
@@ -97396,6 +97395,7 @@ encoder:
 𧝽	xgzu
 𭋯	xgzu
 𱔃	xgzu
+𲟫	xgzu
 㘑	xh,o
 褟	xh,r
 禢	xh,r
@@ -101709,7 +101709,6 @@ encoder:
 𤠘	y/ju
 𧊬	y/ju
 𩙫	y/ju
-𲮛	y/jw
 𪙗	y/ku
 𨕤	y/kw
 𫐻	y/kw
@@ -103615,6 +103614,7 @@ encoder:
 𡮵	ygjw
 𢐯	ygjw
 𧄚	ygjw
+𲮛	ygjw
 𳅮	ygjw
 菇	ygkr
 𧃐	ygkr

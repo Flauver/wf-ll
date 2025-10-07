@@ -44,6 +44,7 @@ local cjkCharacterBlocks = {
     { 0x3400,  0x4DBF },  -- CJK Unified Ideographs Extension A
     { 0x20000, 0x323AF }, -- CJK Unified Ideographs Extension B-H
     { 0x2EBF0, 0x2EE5F }, -- CJK Unified Ideographs Extension I
+    { 0x323B0, 0x33479 }, -- CJK Unified Ideographs Extension J
     { 0x2E80,  0x2EFF },  -- CJK Radicals Supplement
     { 0x2F00,  0x2FDF },  -- Kangxi Radicals
     { 0x31C0,  0x31EF },  -- CJK Strokes

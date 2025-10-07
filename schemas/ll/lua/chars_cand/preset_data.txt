@@ -5695,7 +5695,7 @@ w𡛅 r② u㚵 o④	gjd
 w① r𫼂 u𡛨 o④	gjf
 w蹉 r② u𡟜 o兏	gjg
 w踏 r娹 u𨤼 o𠏳	gjh
-w𨤶 r𡡂 u曷 o④	gjj
+w𨤶 r𡡂 u曷 o𳅩	gjj
 w逓 r汞 u𧈫 o④	gjk
 w① r嬇 u𬪾 o④	gjl
 w厘 r𣱷 u③ o𠝤	gjm
@@ -13283,7 +13283,7 @@ w芾 r② u𦭏 o④	y/d
 w荟 r戤 u𨎆 o𤝊	y/f
 w茎 r赏 u𮐨 o𧀏	y/g
 w𦱗 r𦃂 u③ o皺	y/h
-w𲮛 r菉 u㺈 o𪚳	y/j
+w① r菉 u㺈 o𪚳	y/j
 w𨕤 r② u𪙗 o④	y/k
 w𤠥 r薰 u苍 o④	y/l
 w𢞪 r𦮳 u③ o荆	y/m
