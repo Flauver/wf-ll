@@ -869,6 +869,11 @@ func AppendToDictFile(sourceFile, targetFile string, needSort, removeFreq bool) 
 		// 排序
 		sortDictEntries(entries)
 		
+		// 对LL.chars.full.dict.yaml进行特殊处理：简码汉字下移
+		if strings.Contains(targetFile, "LL.chars.full.dict.yaml") {
+			entries = processSimpleCharsInFullDict(entries)
+		}
+		
 		// 构建排序后的内容
 		var result strings.Builder
 		for _, entry := range entries {
@@ -1098,6 +1103,166 @@ func sortDictEntries(entries []*DictEntry) {
 		// 编码相同，按词频降序排列
 		return a.Freq > b.Freq
 	})
+}
+
+// processSimpleCharsInFullDict 对LL.chars.full.dict.yaml中的简码汉字进行特殊处理
+func processSimpleCharsInFullDict(entries []*DictEntry) []*DictEntry {
+	// 读取简码文件，构建简码汉字映射
+	simpleChars := loadSimpleChars()
+	
+	// 按编码分组处理
+	groupedEntries := groupEntriesByCode(entries)
+	
+	// 对每个编码组进行特殊处理，然后重新组装
+	result := make([]*DictEntry, 0, len(entries))
+	for _, group := range groupedEntries {
+		processedGroup := processCodeGroup(group, simpleChars)
+		result = append(result, processedGroup...)
+	}
+	
+	return result
+}
+
+// loadSimpleChars 从code_chars_simp.txt加载简码汉字信息
+func loadSimpleChars() map[string]int {
+	simpleChars := make(map[string]int)
+	
+	// 简码文件路径，这里假设在deploy/tmp目录下
+	simpleFile := "../deploy/tmp/code_chars_simp.txt"
+	file, err := os.Open(simpleFile)
+	if err != nil {
+		// 如果文件不存在，返回空映射
+		return simpleChars
+	}
+	defer file.Close()
+	
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		
+		fields := strings.Split(line, "\t")
+		if len(fields) < 2 {
+			continue
+		}
+		
+		char := fields[0]
+		code := fields[1]
+		
+		// 根据编码长度判断是一简还是二简
+		// 一简：编码长度为1或2（一简+补码）
+		// 二简：编码长度为2或3（二简+补码）
+		if len(code) == 1 || len(code) == 2 {
+			simpleChars[char] = 1 // 一简（包括一简+补码）
+		} else if len(code) == 3 {
+			simpleChars[char] = 2 // 二简（包括二简+补码）
+		}
+	}
+	
+	return simpleChars
+}
+
+// groupEntriesByCode 按编码对条目进行分组，保持原有编码顺序
+func groupEntriesByCode(entries []*DictEntry) [][]*DictEntry {
+	groups := make(map[string][]*DictEntry)
+	codeOrder := make([]string, 0)
+	
+	for _, entry := range entries {
+		if _, exists := groups[entry.Code]; !exists {
+			codeOrder = append(codeOrder, entry.Code)
+		}
+		groups[entry.Code] = append(groups[entry.Code], entry)
+	}
+	
+	// 按原有编码顺序转换为切片
+	result := make([][]*DictEntry, 0, len(groups))
+	for _, code := range codeOrder {
+		result = append(result, groups[code])
+	}
+	
+	return result
+}
+
+// processCodeGroup 处理单个编码组的简码汉字特殊排序
+func processCodeGroup(group []*DictEntry, simpleChars map[string]int) []*DictEntry {
+	if len(group) < 3 {
+		// 如果重码组内候选不足三个，不应用特殊规则
+		return group
+	}
+	
+	// 创建副本进行处理，避免影响原始数据
+	result := make([]*DictEntry, len(group))
+	copy(result, group)
+	
+	// 第一步：处理一简汉字，下移2行
+	result = moveSimpleChars(result, simpleChars, 1, 2)
+	
+	// 第二步：处理二简汉字，下移2行
+	result = moveSimpleChars(result, simpleChars, 2, 2)
+	
+	// 第三步：处理"的"、"了"二字，下移2位
+	result = moveSpecialChars(result)
+	
+	return result
+}
+
+// moveSimpleChars 移动简码汉字
+func moveSimpleChars(group []*DictEntry, simpleChars map[string]int, simpleType int, moveCount int) []*DictEntry {
+	result := make([]*DictEntry, len(group))
+	copy(result, group)
+	
+	// 找到所有指定类型的简码汉字
+	simpleIndices := make([]int, 0)
+	for i, entry := range result {
+		if simpleChars[entry.Text] == simpleType {
+			simpleIndices = append(simpleIndices, i)
+		}
+	}
+	
+	// 对每个简码汉字进行移动（从后往前处理，避免索引变化）
+	for i := len(simpleIndices) - 1; i >= 0; i-- {
+		idx := simpleIndices[i]
+		if idx+moveCount < len(result) {
+			// 将简码汉字下移moveCount个位置
+			temp := result[idx]
+			for j := idx; j < idx+moveCount; j++ {
+				result[j] = result[j+1]
+			}
+			result[idx+moveCount] = temp
+		}
+	}
+	
+	return result
+}
+
+// moveSpecialChars 移动特殊字符"的"和"了"
+func moveSpecialChars(group []*DictEntry) []*DictEntry {
+	result := make([]*DictEntry, len(group))
+	copy(result, group)
+	
+	specialChars := map[string]bool{
+		"的": true,
+		"了": true,
+	}
+	
+	// 找到特殊字符的位置
+	for i, entry := range result {
+		if specialChars[entry.Text] {
+			// 下移2位
+			if i+2 < len(result) {
+				temp := result[i]
+				for j := i; j < i+2; j++ {
+					result[j] = result[j+1]
+				}
+				result[i+2] = temp
+			}
+			break // 每次只处理一个特殊字符
+		}
+	}
+	
+	return result
 }
 
 // mergeDictEntries 合并字典条目，避免重复
