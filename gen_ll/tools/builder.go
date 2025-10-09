@@ -1440,13 +1440,56 @@ encoder:
 `, description, name)
 }
 
+// LoadFullDictMap 从LL.chars.full.dict.yaml码表文件加载字符映射
+func LoadFullDictMap(dictFilePath string) (map[string][]string, error) {
+	file, err := os.Open(dictFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("打开码表文件失败: %w", err)
+	}
+	defer file.Close()
+
+	codeCharMap := make(map[string][]string)
+	scanner := bufio.NewScanner(file)
+	
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// 跳过注释和元数据行
+		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "---") ||
+		   strings.HasPrefix(line, "...") || strings.HasPrefix(line, "name:") ||
+		   strings.HasPrefix(line, "version:") || strings.HasPrefix(line, "sort:") ||
+		   strings.HasPrefix(line, "columns:") || strings.HasPrefix(line, "encoder:") ||
+		   strings.HasPrefix(line, "  - ") || strings.HasPrefix(line, "  exclude_patterns:") ||
+		   strings.HasPrefix(line, "  rules:") {
+			continue
+		}
+		
+		// 解析数据行：字符\t编码
+		fields := strings.Split(line, "\t")
+		if len(fields) >= 2 {
+			char := fields[0]
+			code := fields[1]
+			codeCharMap[code] = append(codeCharMap[code], char)
+		}
+	}
+	
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("读取码表文件失败: %w", err)
+	}
+	
+	return codeCharMap, nil
+}
+
 // BuildPresetData 根据单字简码表和全码表生成 preset_data.txt
 func BuildPresetData(simpleCodeList []*types.CharMeta, fullCodeMetaList []*types.CharMeta) ([]string, error) {
-	// 创建全码字符映射，用于查找三码组合对应的实际字符
-	fullCodeMap := make(map[string][]*types.CharMeta)
-	for _, charMeta := range fullCodeMetaList {
-		// 使用全码作为键
-		fullCodeMap[charMeta.Code] = append(fullCodeMap[charMeta.Code], charMeta)
+	// 尝试从deploy/tmp/LL.chars.full.dict.yaml码表文件加载字符映射
+	fullDictPath := "../deploy/tmp/LL.chars.full.dict.yaml"
+	codeCharMap, err := LoadFullDictMap(fullDictPath)
+	if err != nil {
+		// 如果码表文件不存在，回退到使用fullCodeMetaList
+		codeCharMap = make(map[string][]string)
+		for _, charMeta := range fullCodeMetaList {
+			codeCharMap[charMeta.Code] = append(codeCharMap[charMeta.Code], charMeta.Char)
+		}
 	}
 	
 	// 按前缀分组（使用简码表）
@@ -1530,7 +1573,7 @@ func BuildPresetData(simpleCodeList []*types.CharMeta, fullCodeMetaList []*types
 	}
 	
 	// 添加三码组合（",,,~zzz"）的13824个组合
-	outputLines = append(outputLines, generateThreeCodeCombinations(fullCodeMap)...)
+	outputLines = append(outputLines, generateThreeCodeCombinations(codeCharMap)...)
 	
 	// 按编码（code）升序排列
 	sort.Slice(outputLines, func(i, j int) bool {
@@ -1547,7 +1590,7 @@ func BuildPresetData(simpleCodeList []*types.CharMeta, fullCodeMetaList []*types
 }
 
 // generateThreeCodeCombinations 生成三码组合的数据，使用实际字符或占位符
-func generateThreeCodeCombinations(fullCodeMap map[string][]*types.CharMeta) []string {
+func generateThreeCodeCombinations(codeCharMap map[string][]string) []string {
 	// 24个键：qtypasdfghjkl;zxcvbnm,./
 	keys := []string{"q", "t", "y", "p", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/"}
 	
@@ -1560,10 +1603,10 @@ func generateThreeCodeCombinations(fullCodeMap map[string][]*types.CharMeta) []s
 				prefix := first + second + third
 				
 				// 查找对应四个后缀的实际字符
-				wChar := findCharForCode(fullCodeMap, prefix+"w")
-				rChar := findCharForCode(fullCodeMap, prefix+"r")
-				uChar := findCharForCode(fullCodeMap, prefix+"u")
-				oChar := findCharForCode(fullCodeMap, prefix+"o")
+				wChar := findCharForCodeFromDict(codeCharMap, prefix+"w")
+				rChar := findCharForCodeFromDict(codeCharMap, prefix+"r")
+				uChar := findCharForCodeFromDict(codeCharMap, prefix+"u")
+				oChar := findCharForCodeFromDict(codeCharMap, prefix+"o")
 				
 				// 构建候选项
 				candidates := make([]string, 0, 4)
@@ -1598,11 +1641,11 @@ func generateThreeCodeCombinations(fullCodeMap map[string][]*types.CharMeta) []s
 	return outputLines
 }
 
-// findCharForCode 在全码映射中查找对应编码的字符
-func findCharForCode(fullCodeMap map[string][]*types.CharMeta, code string) string {
-	if chars, exists := fullCodeMap[code]; exists && len(chars) > 0 {
-		// 返回第一个字符（通常是词频最高的）
-		return chars[0].Char
+// findCharForCodeFromDict 在码表映射中查找对应编码的字符
+func findCharForCodeFromDict(codeCharMap map[string][]string, code string) string {
+	if chars, exists := codeCharMap[code]; exists && len(chars) > 0 {
+		// 返回重码组内最上方的字符（码表文件中的第一个字符）
+		return chars[0]
 	}
 	return ""
 }

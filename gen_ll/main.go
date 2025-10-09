@@ -193,20 +193,10 @@ func main() {
 		log.Println("开始写入文件...")
 	}
 
-	// 生成 preset_data.txt
-	if !args.Quiet {
-		log.Println("开始生成 preset_data.txt...")
-	}
-	presetDataLines, err := tools.BuildPresetData(simpleCodeList, fullCodeMetaList)
-	if err != nil {
-		log.Printf("生成 preset_data.txt 失败: %v", err)
-	} else if !args.Quiet {
-		log.Printf("preset_data.txt 生成完成，共 %d 项\n", len(presetDataLines))
-	}
 
 	// 使用并行处理加速文件写入
 	var wg sync.WaitGroup
-	fileCount := 5 // 基础文件：FULLCHAR, SIMPLECODE, DIVISION, DAZHUCHAI, PRESETDATA
+	fileCount := 4 // 基础文件：FULLCHAR, SIMPLECODE, DIVISION, DAZHUCHAI
 	if wordCodes != nil {
 		fileCount++
 	}
@@ -351,20 +341,6 @@ func main() {
 		}()
 	}
 
-	// PRESETDATA - preset_data.txt
-	go func() {
-		defer wg.Done()
-		buffer := bytes.Buffer{}
-		for _, line := range presetDataLines {
-			buffer.WriteString(line + "\n")
-		}
-		err := os.WriteFile(args.PresetData, buffer.Bytes(), 0o644)
-		if err != nil {
-			errChan <- fmt.Errorf("写入PRESETDATA文件错误: %w", err)
-		} else if !args.Quiet {
-			log.Printf("PRESETDATA文件写入完成: %s\n", args.PresetData)
-		}
-	}()
 
 	// 写入多字词简码表
 	if wordSimpleCodes != nil {
@@ -500,6 +476,28 @@ func main() {
 		log.Printf("生成字根码表失败: %v", err)
 	} else if !args.Quiet {
 		log.Printf("字根码表生成完成: %s\n", args.RootsDict)
+	}
+
+	// 在追加完所有字典文件后生成 preset_data.txt
+	if !args.Quiet {
+		log.Println("开始生成 preset_data.txt...")
+	}
+	presetDataLines, err := tools.BuildPresetData(simpleCodeList, fullCodeMetaList)
+	if err != nil {
+		log.Printf("生成 preset_data.txt 失败: %v", err)
+	} else if !args.Quiet {
+		log.Printf("preset_data.txt 生成完成，共 %d 项\n", len(presetDataLines))
+	}
+
+	// 写入 preset_data.txt
+	if !args.Quiet {
+		log.Println("开始写入 preset_data.txt...")
+	}
+	err = os.WriteFile(args.PresetData, []byte(strings.Join(presetDataLines, "\n")), 0o644)
+	if err != nil {
+		log.Printf("写入 preset_data.txt 失败: %v", err)
+	} else if !args.Quiet {
+		log.Printf("preset_data.txt 写入完成: %s\n", args.PresetData)
 	}
 }
 
