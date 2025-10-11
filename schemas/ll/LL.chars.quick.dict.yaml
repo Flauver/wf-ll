@@ -198,11 +198,11 @@ encoder:
 虔	.au
 趙	.aw
 正	.bo
-𧰳	.br
+𘥫	.br
 赸	.bu
 候	.bw
 璧	.co
-𧰬	.cr
+𠄡	.cr
 赵	.cu
 殚	.cw
 再	.do
@@ -287,7 +287,7 @@ encoder:
 劝	/.w
 策	//o
 费	//r
-瘫	//u
+婴	//u
 九	//w
 贴	/;o
 笔	/;r
@@ -389,7 +389,7 @@ encoder:
 𠣼	;/r
 圈	;/u
 奈	;/w
-粘	;;o
+书	;;o
 麟	;;r
 虱	;;u
 因	;;w
@@ -405,7 +405,7 @@ encoder:
 舆	;cr
 𡗜	;cu
 旃	;cw
-书	;do
+顛	;do
 真	;dr
 刍	;du
 买	;dw
@@ -540,7 +540,7 @@ encoder:
 铅	ano
 铀	anr
 躲	anu
-垒	anw
+锤	anw
 东	ao
 镦	apo
 醇	apr
@@ -600,7 +600,7 @@ encoder:
 寿	bbo
 驹	bbr
 毒	bbu
-崃	bbw
+慧	bbw
 巍	bco
 嶷	bcr
 库	bcu
@@ -782,7 +782,7 @@ encoder:
 绅	d,u
 纵	d,w
 绍	d.o
-丝	d.r
+蒙	d.r
 蟹	d.u
 解	d.w
 𢒫	d/o
@@ -806,7 +806,7 @@ encoder:
 阅	dcu
 阐	dcw
 缓	ddo
-𗀵	ddr
+丝	ddr
 影	ddu
 阖	ddw
 统	dfo
@@ -911,8 +911,8 @@ encoder:
 𫻴	fdw
 毕	ffo
 戕	ffr
-𢧞	ffu
-牁	ffw
+歌	ffu
+哥	ffw
 充	fgo
 版	fgr
 危	fgu
@@ -975,7 +975,7 @@ encoder:
 状	fyw
 久	fzo
 翘	fzr
-歌	fzu
+皆	fzu
 飾	fzw
 兆	g,o
 亚	g,r
@@ -1092,7 +1092,7 @@ encoder:
 壽	h;o
 晐	h;r
 幻	h;u
-昌	h;w
+鞑	h;w
 天	hao
 晙	har
 鞣	hau
@@ -1109,7 +1109,7 @@ encoder:
 果	hdr
 丅	hdu
 昨	hdw
-幾	hfo
+絨	hfo
 晚	hfr
 晓	hfu
 昆	hfw
@@ -1118,8 +1118,8 @@ encoder:
 星	hgu
 紅	hgw
 爱	hho
-續	hhr
-㬎	hhu
+曝	hhr
+畿	hhu
 拜	hhw
 夥	hjo
 曦	hjr
@@ -1191,7 +1191,7 @@ encoder:
 遗	j/w
 蛾	j;o
 耗	j;r
-粥	j;u
+耒	j;u
 美	j;w
 耙	jao
 羧	jar
@@ -1238,8 +1238,8 @@ encoder:
 虫	jmu
 忒	jmw
 蟢	jno
-蚰	jnr
-疆	jnu
+疆	jnr
+蟛	jnu
 逄	jnw
 不	jo
 黾	jpo
@@ -1352,7 +1352,7 @@ encoder:
 谓	kqw
 交	kr
 设	kso
-嚣	ksr
+颌	ksr
 话	ksu
 辶	ksw
 乐	kto
@@ -1369,10 +1369,10 @@ encoder:
 覆	kxr
 谁	kxu
 读	kxw
-诺	kyo
+器	kyo
 𫬢	kyr
 罐	kyu
-器	kyw
+哭	kyw
 许	kzo
 𰵞	kzr
 议	kzu
@@ -1431,7 +1431,7 @@ encoder:
 近	lkw
 霁	llo
 传	llr
-倫	llu
+嬰	llu
 伍	llw
 偷	lmo
 黑	lmr
@@ -1683,7 +1683,7 @@ encoder:
 忙	p,w
 怔	p.o
 豪	p.r
-𢛢	p.u
+𭝬	p.u
 恼	p.w
 恻	p/o
 贯	p/r
@@ -1793,9 +1793,9 @@ encoder:
 而	q;r
 束	q;u
 琦	q;w
-琶	qao
+斑	qao
 㺭	qar
-斑	qau
+玟	qau
 現	qaw
 衣	qbo
 瑞	qbr
@@ -1834,7 +1834,7 @@ encoder:
 褒	qlu
 化	qlw
 班	qmo
-瑟	qmr
+鲂	qmr
 瑋	qmu
 思	qmw
 畤	qno
@@ -1846,10 +1846,10 @@ encoder:
 瑙	qpr
 鲫	qpu
 珢	qpw
-玞	qqo
-鲕	qqr
+琶	qqo
+琴	qqr
 玩	qqu
-鳃	qqw
+替	qqw
 出	qr
 環	qso
 顶	qsr
@@ -1861,12 +1861,12 @@ encoder:
 鸷	qtw
 界	qu
 整	qvo
-琴	qvr
+夔	qvr
 田	qvu
 鲶	qvw
 现	qw
 哀	qxo
-喬	qxr
+㻪	qxr
 琟	qxu
 琄	qxw
 球	qyo
@@ -1986,7 +1986,7 @@ encoder:
 燦	t.u
 脑	t.w
 頁	t/o
-赞	t/r
+滕	t/r
 釜	t/u
 当	t/w
 氏	t;o
@@ -2055,9 +2055,9 @@ encoder:
 烦	tsr
 枭	tsu
 腋	tsw
-胝	tto
-烘	ttr
-燃	ttu
+朋	tto
+赞	ttr
+炎	ttu
 鹏	ttw
 然	tu
 胀	tvo
@@ -2102,7 +2102,7 @@ encoder:
 碳	vbu
 职	vbw
 眉	vco
-礳	vcr
+𫵭	vcr
 尼	vcu
 谷	vcw
 长	vdo
@@ -2185,9 +2185,9 @@ encoder:
 初	x.r
 唬	x.u
 徒	x.w
-徐	x/o
+响	x/o
 叹	x/r
-响	x/u
+啥	x/u
 径	x/w
 哦	x;o
 咳	x;r
@@ -2383,7 +2383,7 @@ encoder:
 背	z,w
 𱀌	z.o
 陋	z.r
-𭁃	z.u
+䖎	z.u
 陡	z.w
 除	z/o
 阡	z/r
@@ -2428,7 +2428,7 @@ encoder:
 己	zko
 皎	zkr
 𨩁	zku
-进	zkw
+迫	zkw
 附	zlo
 产	zlr
 卮	zlu
@@ -2437,11 +2437,11 @@ encoder:
 防	zmr
 陴	zmu
 已	zmw
-陼	zno
+年	zno
 陵	znr
 陆	znu
 陨	znw
-年	zo
+为	zo
 朗	zpo
 隔	zpr
 辉	zpu
@@ -2456,7 +2456,7 @@ encoder:
 白	zsu
 䧒	zsw
 阴	zto
-巽	ztr
+𤽔	ztr
 欠	ztu
 鸭	ztw
 才	zu
@@ -2464,7 +2464,7 @@ encoder:
 陬	zvr
 兀	zvu
 甲	zvw
-为	zw
+进	zw
 后	zxo
 隲	zxr
 陮	zxu
