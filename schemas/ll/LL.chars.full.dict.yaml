@@ -1151,6 +1151,7 @@ encoder:
 𥎰	,dcw
 𭓿	,ddr
 ⺝	,ddw
+冃	,ddw
 𘡹	,ddw
 𘮹	,ddw
 𡪃	,dfo
@@ -10176,8 +10177,9 @@ encoder:
 𪜙	/;yu
 𳅱	/;yu
 𥭒	/;yw
-贴	/;zo
+𥲬	/;zo
 𮡺	/;zo
+贴	/;zo
 赅	/;zr
 𨩤	/;zr
 𨮁	/;zr
@@ -13082,7 +13084,6 @@ encoder:
 𤷸	/mzo
 𥬃	/mzo
 则	/mzo
-𥲬	/mzo
 𮁜	/mzo
 𮊨	/mzo
 𰪙	/mzo
@@ -15582,6 +15583,7 @@ encoder:
 𥹈	;,cu
 𥻮	;,cu
 𪋃	;,cu
+𬀜	;,cu
 𰴿	;,cu
 𳄔	;,cu
 𥻞	;,do
@@ -15599,6 +15601,7 @@ encoder:
 𧗕	;,fw
 𪊒	;,fw
 𪊢	;,fw
+𭥃	;,fw
 𫰃	;,gr
 𡜰	;,gu
 𡢗	;,gu
@@ -15704,16 +15707,21 @@ encoder:
 𲉔	;,to
 𳊷	;,to
 𢩟	;,tr
+𣄘	;,tr
 㷗	;,tu
+𣃵	;,tu
+𣃼	;,tu
 𤋅	;,tu
 𤐫	;,tu
 𤒮	;,tu
 𤓫	;,tu
+𬀏	;,tu
 𱬧	;,tu
 𱬱	;,tu
 𬸦	;,tw
 𘱅	;,tw
 族	;,tw
+𣃨	;,tw
 𥽕	;,tw
 㪎	;,vo
 𡇵	;,vo
@@ -15780,6 +15788,7 @@ encoder:
 𮬧	;./w
 囫	;.;r
 粅	;.;r
+𣃦	;.;r
 𩡨	;.;r
 𪊖	;.;r
 𬆿	;.;r
@@ -15882,6 +15891,7 @@ encoder:
 𣯤	;.vu
 𥻿	;.vu
 㘞	;.vw
+𬀂	;.vw
 𱐱	;.vw
 䴥	;.xo
 𣭋	;.xo
@@ -15892,6 +15902,7 @@ encoder:
 𩣅	;.xr
 𨾆	;.xu
 𪥍	;.xu
+𪰀	;.yu
 籾	;.zo
 巹	;.zo
 𡘟	;.zo
@@ -15910,6 +15921,7 @@ encoder:
 𤾋	;//r
 𥺑	;//r
 𲻌	;//r
+𩙴	;//u
 𪀄	;//w
 𬷝	;//w
 𣮦	;/;r
@@ -15941,6 +15953,7 @@ encoder:
 𪊌	;/fw
 𪊑	;/fw
 𪋞	;/fw
+𰕭	;/fw
 𱸾	;/fw
 𡴃	;/gr
 𩿝	;/gw
@@ -15979,6 +15992,7 @@ encoder:
 𬖘	;/nr
 𡚛	;/nw
 𰫁	;/nw
+𣄀	;/qo
 𮳁	;/qo
 𪾚	;/qw
 𰋳	;/so
@@ -15991,6 +16005,8 @@ encoder:
 鵞	;/sw
 䊂	;/to
 𥜛	;/to
+𪯳	;/tr
+𣃩	;/tu
 𥼙	;/tu
 𮇤	;/tu
 㘝	;/vr
@@ -16035,6 +16051,7 @@ encoder:
 𠡛	;;.w
 𲓋	;;.w
 𠭛	;;/r
+𣃳	;;/r
 𣯜	;;/r
 𥹉	;;/r
 𪋕	;;/r
@@ -16049,6 +16066,7 @@ encoder:
 ㇓	;;;r
 𘠂	;;;r
 𣰰	;;;r
+𬀢	;;;r
 𠂍	;;;u
 𠒍	;;;u
 𬇈	;;;u
@@ -16057,6 +16075,7 @@ encoder:
 𪊦	;;;w
 𫂾	;;;w
 𫯛	;;;w
+𬀡	;;;w
 籷	;;ao
 𘭻	;;ao
 𮎞	;;ao
@@ -16095,6 +16114,7 @@ encoder:
 𡈓	;;dr
 𥻪	;;dr
 𪋮	;;dr
+𬀣	;;dr
 𢒣	;;du
 𬛹	;;du
 𗉠	;;dw
@@ -16130,6 +16150,7 @@ encoder:
 𥽱	;;gu
 𰋝	;;gw
 𠀄	;;ho
+𣃴	;;ho
 𣯁	;;ho
 𫭌	;;ho
 𲘟	;;ho
@@ -16237,12 +16258,16 @@ encoder:
 𲷇	;;su
 𗉒	;;sw
 𩔖	;;to
+𩕇	;;to
 𩕲	;;to
 𩖃	;;to
 𬗀	;;to
+𭤰	;;to
 旄	;;tr
 𤴙	;;tr
 𰚲	;;tr
+𣄦	;;tu
+𣄪	;;tu
 𱫵	;;tu
 𲱎	;;tu
 𢾗	;;vo
@@ -16261,6 +16286,7 @@ encoder:
 𡈲	;;vw
 𥺭	;;xo
 䊆	;;xu
+𣄑	;;xu
 𡘑	;;xw
 𡘩	;;xw
 𳅦	;;yo
@@ -16270,6 +16296,7 @@ encoder:
 𢍍	;;yu
 𢍘	;;yu
 𢍙	;;yu
+𣃬	;;yu
 𦥤	;;yu
 𭽎	;;yu
 𰪮	;;yu
@@ -16371,6 +16398,7 @@ encoder:
 𣯶	;adu
 𩰪	;adu
 𮫘	;adu
+𱡸	;adu
 𘯒	;adw
 𦦵	;afo
 𪊚	;afo
@@ -16458,15 +16486,19 @@ encoder:
 𩑑	;ato
 𩑒	;ato
 𩔬	;ato
+𭤸	;ato
 斿	;atr
 𠔹	;atr
+𣄉	;atr
 𥹼	;atr
 𩰠	;atr
 𡇺	;atu
+𣃭	;atu
 𤌑	;atu
 𤓕	;atu
 𤓟	;atu
 𦏗	;atu
+𬀀	;atu
 𬋡	;atu
 𱬰	;atu
 𱬲	;atu
@@ -16484,6 +16516,7 @@ encoder:
 𦦻	;avu
 𪢨	;avu
 𮂮	;avu
+𣄐	;avw
 𧡚	;avw
 𫚃	;avw
 囼	;axo
@@ -16557,6 +16590,7 @@ encoder:
 𗁏	;bdw
 𪋖	;bfo
 𫯣	;bfo
+𣄞	;bfr
 𡵎	;bfu
 𭗎	;bfu
 䊌	;bfw
@@ -16625,11 +16659,13 @@ encoder:
 𦦇	;bqr
 𫯥	;bso
 𥼠	;bsu
+𣄖	;bto
 𮇻	;bto
 𤇀	;btu
 𥼌	;btu
 𥼞	;btu
 𲷐	;btu
+𣄕	;btw
 団	;bvo
 囙	;bvr
 𗟟	;bvr
@@ -16682,6 +16718,7 @@ encoder:
 𠬲	;c/r
 𡗪	;c/r
 𡚠	;c/r
+𪯽	;c/r
 𨫦	;c/u
 鷯	;c/w
 𥘾	;c/w
@@ -16832,6 +16869,7 @@ encoder:
 尞	;cto
 𩓽	;cto
 𩔣	;cto
+𩔽	;cto
 𩕐	;cto
 𩕑	;cto
 𩕦	;cto
@@ -16840,6 +16878,7 @@ encoder:
 𡚔	;ctu
 𤊽	;ctu
 𤋯	;ctu
+𬀍	;ctu
 𰟥	;ctu
 旃	;ctw
 鹩	;ctw
@@ -16925,6 +16964,7 @@ encoder:
 𣰘	;d;r
 𣰡	;d;r
 𦦂	;d;r
+𬀖	;d;r
 𮇷	;d;r
 𡆵	;d;u
 𦥕	;d;u
@@ -17179,6 +17219,7 @@ encoder:
 𗳓	;dto
 𡮧	;dto
 𲬡	;dtu
+𬀄	;dtw
 𱉳	;dtw
 𱊚	;dtw
 㪢	;dvo
@@ -17400,6 +17441,8 @@ encoder:
 䫑	;fto
 𩑓	;fto
 𫂼	;fto
+𣃰	;ftr
+𬀃	;ftr
 𰞿	;ftu
 𲨐	;ftu
 㫊	;ftw
@@ -17726,6 +17769,7 @@ encoder:
 𦑹	;h,r
 𦥳	;h,r
 𨺫	;h,r
+𬀕	;h,r
 䊟	;h,w
 𣯩	;h,w
 𦙍	;h,w
@@ -17777,6 +17821,7 @@ encoder:
 𡇢	;hco
 𡙍	;hco
 𡚐	;hco
+𬀋	;hco
 𘆎	;hcu
 𘒇	;hcu
 𘒉	;hcu
@@ -17836,6 +17881,7 @@ encoder:
 𲨑	;hgu
 𢪓	;hgw
 𢮠	;hgw
+𪰄	;hgw
 𘯵	;hho
 𘲎	;hho
 𣰈	;hho
@@ -17957,11 +18003,13 @@ encoder:
 旇	;hto
 纇	;hto
 𩓇	;hto
+𪯶	;hto
 𬖾	;hto
 𮨃	;hto
 𳊸	;hto
 𥌝	;htu
 𥽫	;htu
+𣃧	;htw
 𳐏	;htw
 囚	;hvo
 糤	;hvo
@@ -18005,6 +18053,7 @@ encoder:
 𱰅	;hzo
 𘒒	;hzr
 䶾	;hzu
+𣄙	;hzu
 𥽵	;hzu
 糑	;j,o
 𣭧	;j.o
@@ -18037,6 +18086,7 @@ encoder:
 𦎃	;j;r
 𫭍	;j;r
 𫯭	;j;r
+𬀑	;j;r
 𰛆	;j;r
 䖝	;j;u
 𗎦	;j;u
@@ -18081,6 +18131,7 @@ encoder:
 䑘	;jgw
 𢎍	;jgw
 𥹨	;jgw
+𬀒	;jgw
 𘡏	;jho
 𰤭	;jho
 氹	;jhr
@@ -18108,15 +18159,18 @@ encoder:
 𥹯	;jku
 𧊾	;jku
 粴	;jkw
+𣄧	;jkw
 𥸲	;jkw
 𨔶	;jkw
 𮇡	;jkw
+𰻔	;jkw
 𱹚	;jkw
 圚	;jlr
 𥼩	;jlr
 𠄪	;jmo
 𠜁	;jmo
 𠜟	;jmo
+𭤻	;jmr
 𢡶	;jmw
 𭜪	;jmw
 𮕄	;jmw
@@ -18143,10 +18197,12 @@ encoder:
 䖸	;jsu
 𧒎	;jsu
 𮔏	;jsu
+𣃽	;jto
 𣭬	;jto
 𩓕	;jto
 𪋈	;jto
 𮔽	;jto
+𬀅	;jtr
 糕	;jtu
 㚠	;jtu
 𡇫	;jtu
@@ -18217,12 +18273,14 @@ encoder:
 㣏	;kdu
 𗉄	;kdw
 𗉅	;kdw
+𬀚	;kdw
 𰠃	;kdw
 𗈽	;kfo
 𠧑	;kfo
 𩜕	;kfo
 𪋦	;kfo
 𥼗	;kfw
+𬀌	;kgo
 𲓚	;kgo
 㫏	;kgu
 𗈾	;kgu
@@ -18232,6 +18290,7 @@ encoder:
 𣯄	;kgu
 𨒑	;kgw
 𨕜	;kho
+𬀟	;kho
 𘠠	;khr
 𠀌	;khr
 𧟢	;khu
@@ -18266,6 +18325,7 @@ encoder:
 𧶻	;klr
 𪑵	;klr
 𥸾	;klu
+𣄨	;klw
 𥽈	;klw
 𰄬	;kmo
 𗉂	;knr
@@ -18282,6 +18342,9 @@ encoder:
 𩔢	;kto
 糊	;kto
 𪥜	;ktr
+𬀇	;ktr
+𰕬	;ktr
+𣃹	;ktu
 𥾀	;ktu
 麣	;kvo
 𡈨	;kvo
@@ -18323,6 +18386,7 @@ encoder:
 𥹃	;lbo
 𳐢	;lbo
 𬣃	;lcu
+𰕮	;ldo
 𣯒	;ldr
 𫯧	;ldw
 𰥺	;ldw
@@ -18418,6 +18482,7 @@ encoder:
 𢖮	;m;r
 𣭈	;m;r
 𥹅	;m;r
+𬀝	;m;r
 𗎼	;m;u
 𠄈	;m;u
 𲶼	;m;u
@@ -18513,6 +18578,7 @@ encoder:
 𡘧	;mmr
 氶	;mmr
 𥹴	;mmr
+𬀔	;mmr
 㥣	;mmw
 𢠴	;mmw
 𥼳	;mmw
@@ -18530,6 +18596,7 @@ encoder:
 甐	;mqr
 𮇹	;msu
 𩕔	;mto
+𱡶	;mto
 𳑃	;mto
 𩏶	;mtu
 𩏷	;mtu
@@ -18648,6 +18715,7 @@ encoder:
 𫡢	;nhw
 𗱉	;njo
 𗳲	;njo
+𣃲	;njo
 𭑥	;njo
 圉	;njr
 𥺙	;njr
@@ -18679,6 +18747,7 @@ encoder:
 𣄯	;nqu
 毀	;nso
 𡇙	;nsu
+𣃯	;nsw
 𥼀	;nto
 𩑧	;nto
 𩑫	;nto
@@ -18799,6 +18868,7 @@ encoder:
 𬖤	;pkr
 𬖰	;pku
 𦢰	;pkw
+𫑉	;pkw
 𮇜	;pkw
 𮞜	;pkw
 𲅵	;pkw
@@ -18833,10 +18903,12 @@ encoder:
 爨	;ptu
 㸑	;ptu
 爂	;ptu
+𬀆	;ptu
 𲬹	;ptu
 𥻩	;ptw
 𫛡	;ptw
 𢿹	;pvo
+𬀐	;pvo
 𭤍	;pvo
 𭯫	;pvo
 𰫑	;pvo
@@ -18994,6 +19066,7 @@ encoder:
 𮵻	;qsr
 𬐡	;qsw
 旅	;qto
+𣄆	;qto
 𲊯	;qto
 糞	;qtr
 旊	;qtr
@@ -19076,6 +19149,7 @@ encoder:
 𲘬	;sjr
 𧏟	;sju
 𧕠	;sju
+𬀞	;sju
 𥻗	;sjw
 旜	;sjw
 氊	;sjw
@@ -19139,6 +19213,7 @@ encoder:
 𮇣	;szo
 𥹬	;szr
 𣣩	;szu
+𬀠	;t,u
 糈	;t,w
 𥪱	;t,w
 毜	;t.o
@@ -19192,6 +19267,7 @@ encoder:
 𡈸	;thr
 𪸍	;thu
 𣋴	;thw
+𬀙	;thw
 𱖀	;thw
 𱥢	;thw
 𰣠	;tjr
@@ -19235,11 +19311,16 @@ encoder:
 𰘡	;tsu
 鹅	;tsw
 𘮜	;tto
-𰕯	;tto
+𣃥	;tto
 丄	;tto
+𣃮	;tto
+𰕯	;tto
+𣄢	;ttr
+𭤨	;ttr
 旋	;ttr
 㷩	;ttu
 熈	;ttu
+𣄡	;ttu
 𣰂	;ttu
 施	;ttw
 𡆧	;tvo
@@ -19249,6 +19330,7 @@ encoder:
 𡇖	;tvr
 𡈩	;tvr
 𡇂	;tvu
+𪰅	;tvu
 𱕼	;tvu
 𢄲	;tvw
 𥼇	;tvw
@@ -19398,6 +19480,7 @@ encoder:
 直	;vvw
 𡇝	;vvw
 𢄞	;vvw
+𬀤	;vvw
 𭍯	;vvw
 𱕿	;vvw
 𡇱	;vxo
@@ -19454,6 +19537,7 @@ encoder:
 𱹑	;xbo
 𲛄	;xbo
 嗭	;xcu
+𬀈	;xcu
 𮇎	;xcu
 𲔥	;xcu
 𦦫	;xdr
@@ -19545,6 +19629,7 @@ encoder:
 𬱈	;xto
 𤆨	;xtu
 𥼚	;xtu
+𬀓	;xtu
 𰞰	;xtu
 𥝀	;xtw
 𫛦	;xtw
@@ -19577,6 +19662,7 @@ encoder:
 鄅	;xzo
 䣍	;xzo
 郀	;xzo
+𬀘	;xzr
 㰭	;xzu
 𣣚	;xzu
 𣤳	;xzu
@@ -19934,6 +20020,7 @@ encoder:
 𥺯	;ysw
 類	;yto
 䫪	;yto
+𱡳	;yto
 𣰾	;ytr
 舄	;ytu
 燢	;ytu
@@ -19978,6 +20065,7 @@ encoder:
 𗲽	;yyw
 𘨳	;yyw
 𡈭	;yyw
+𣄠	;yyw
 𗱚	;yzo
 𗱯	;yzo
 𗱾	;yzo
@@ -20185,8 +20273,11 @@ encoder:
 𲎎	;ztr
 廌	;ztu
 舃	;ztu
+𣄊	;ztu
+𪯸	;ztu
 𭴚	;ztu
 粚	;ztw
+𣃻	;ztw
 𥹗	;ztw
 𥺡	;ztw
 𱊭	;ztw
@@ -20214,6 +20305,7 @@ encoder:
 𗴍	;zyr
 𘈄	;zyr
 𠙩	;zyr
+𣃿	;zyr
 𫸠	;zyu
 𬍋	;zyw
 𮇸	;zyw
@@ -36380,6 +36472,7 @@ encoder:
 𗁸	dczr
 𗂜	dczr
 𗂭	dczr
+𗂾	dczr
 𗣊	dczr
 𗣚	dczr
 𗣠	dczr
@@ -37176,7 +37269,6 @@ encoder:
 𭞳	dmyw
 觟	dmzo
 㓩	dmzo
-𗂾	dmzo
 𢀽	dmzo
 𨑔	dmzo
 觚	dmzr
@@ -41231,7 +41323,6 @@ encoder:
 暼	fvhw
 𨏗	fvhw
 𬢓	fvhw
-𠝎	fvjo
 𢻹	fvjo
 𱌇	fvjo
 𭘟	fvjr
@@ -41321,6 +41412,7 @@ encoder:
 鸬	fvtw
 𫜁	fvtw
 𱎏	fvtw
+𠝎	fvvo
 𨍿	fvvo
 鄨	fvvu
 𢃊	fvvu
@@ -62593,6 +62685,7 @@ encoder:
 𪯴	m;qo
 𣬵	m;qr
 𫡷	m;qr
+𤃳	m;qu
 𤄜	m;qu
 𤄫	m;qu
 𩏖	m;qu
@@ -65126,7 +65219,6 @@ encoder:
 𠛍	mmqo
 𠜲	mmqo
 𤃃	mmqu
-𤃳	mmqu
 惡	mmqw
 㴵	mmqw
 𣿣	mmqw
@@ -67038,12 +67130,6 @@ encoder:
 𠎛	myzu
 𡌤	myzw
 郫	mz,o
-𣄘	mz,r
-𬀕	mz,r
-𣃵	mz,u
-𣃼	mz,u
-𬀠	mz,u
-𣃨	mz,w
 𣿂	mz,w
 𬈈	mz.o
 𘮕	mz.r
@@ -67056,18 +67142,12 @@ encoder:
 泐	mz.w
 𪵶	mz.w
 𬐼	mz.w
-𣃳	mz/r
-𪯳	mz/r
-𪯽	mz/r
 𱥀	mz/r
 𲩢	mz/r
-𣃩	mz/u
-𩙴	mz/u
 𭳠	mz/w
 汜	mz;o
 𣲆	mz;o
 激	mz;o
-𭤰	mz;o
 𰛗	mz;o
 涪	mz;r
 浐	mz;r
@@ -67075,13 +67155,8 @@ encoder:
 溩	mz;r
 漡	mz;r
 𗆆	mz;r
-𣃦	mz;r
 𣱿	mz;r
 𣶊	mz;r
-𬀑	mz;r
-𬀖	mz;r
-𬀝	mz;r
-𬀢	mz;r
 𲨵	mz;r
 汔	mz;u
 洸	mz;u
@@ -67092,56 +67167,33 @@ encoder:
 𱤾	mz;u
 汫	mz;w
 㳌	mz;w
-𬀡	mz;w
-𭤸	mzao
 𰛴	mzao
-𣄉	mzar
 𭓕	mzar
-𣃭	mzau
 𩚀	mzau
-𬀀	mzau
 𣹝	mzaw
-𣄖	mzbo
 𭔻	mzbo
 海	mzbu
-𣄕	mzbw
 滁	mzco
 𩏳	mzco
-𬀋	mzco
 𠊊	mzcu
 𣴡	mzcu
 𣵻	mzcu
 𩎼	mzcu
-𬀈	mzcu
-𬀍	mzcu
-𬀜	mzcu
 𮳃	mzcu
-𰕮	mzdo
 𣴼	mzdr
 𫤰	mzdr
-𬀣	mzdr
 𭁉	mzdr
-𣃲	mzdu
 𣸥	mzdu
 𭲇	mzdu
-𱡸	mzdu
-𬀄	mzdw
-𬀚	mzdw
 汻	mzfo
 滜	mzfo
 韟	mzfo
 𣴢	mzfo
 𬆋	mzfo
-𣃰	mzfr
-𣄞	mzfr
-𬀃	mzfr
 𣶰	mzfw
 𣼩	mzfw
-𭥃	mzfw
-𰕭	mzfw
 𠥄	mzgo
 𣴟	mzgo
-𬀌	mzgo
 𬈣	mzgo
 𲩓	mzgo
 漋	mzgu
@@ -67149,53 +67201,33 @@ encoder:
 𣢚	mzgu
 𮴻	mzgu
 𱦢	mzgu
-𪰄	mzgw
-𬀒	mzgw
-𣃴	mzho
-𪯶	mzho
-𬀟	mzho
 瀿	mzhr
 𤀇	mzhr
 㳱	mzhw
-𣃧	mzhw
-𬀙	mzhw
 𱧞	mzhw
 𲢒	mzhw
-𣃽	mzjo
 䪖	mzjr
 湶	mzjr
 泳	mzjr
 𣦇	mzjr
 𣸪	mzjr
-𬀅	mzjr
 𬇟	mzjr
 𱦔	mzjr
 𣸀	mzju
-𬀞	mzju
 𬠘	mzju
 𣻙	mzko
 𣵬	mzkr
-𬀇	mzkr
 𭲏	mzkr
-𰕬	mzkr
-𣃹	mzku
 𪙓	mzku
 瀡	mzkw
-𣄧	mzkw
 𤂿	mzkw
-𫑉	mzkw
 𰜫	mzkw
-𰻔	mzkw
 濻	mzlr
 𬉕	mzlr
 𲓸	mzlu
-𣄨	mzlw
 𤂊	mzlw
-𱡶	mzmo
 𣥩	mzmr
 𤮺	mzmr
-𬀔	mzmr
-𭤻	mzmr
 𭰤	mzmr
 㶏	mzmw
 懘	mzmw
@@ -67208,7 +67240,6 @@ encoder:
 𪤊	mznw
 𰊇	mznw
 𠉙	mzpr
-𬀆	mzpu
 㳤	mzpw
 𰕫	mzpw
 浪	mzpw
@@ -67216,13 +67247,10 @@ encoder:
 𱧭	mzpw
 湟	mzqo
 邡	mzqo
-𣄀	mzqo
-𣄆	mzqo
 𣽻	mzqo
 㰳	mzqu
 漑	mzqu
 𪴩	mzqu
-𭤨	mzqu
 盜	mzqw
 𩏛	mzqw
 濼	mzsu
@@ -67230,17 +67258,12 @@ encoder:
 𣓬	mzsu
 𭩱	mzsu
 𱦙	mzsu
-𣃯	mzsw
 𣹁	mzsw
-𣃥	mzto
-𣃮	mzto
 𣼼	mzto
 𣼽	mzto
 𤄰	mzto
 𤅆	mzto
 𩔤	mzto
-𩔽	mzto
-𩕇	mzto
 𩕨	mzto
 𮳈	mzto
 𰛺	mzto
@@ -67248,19 +67271,12 @@ encoder:
 𱦸	mzto
 㳬	mztr
 潠	mztr
-𣄢	mztr
 𱩿	mztr
 溈	mztu
 濓	mztu
-𣄊	mztu
-𣄡	mztu
-𣄦	mztu
-𣄪	mztu
 𣢃	mztu
 𤇐	mztu
 𤈾	mztu
-𬀏	mztu
-𬀓	mztu
 𱫸	mztu
 沲	mztw
 𣥞	mztw
@@ -67269,18 +67285,13 @@ encoder:
 𭳋	mztw
 𥒟	mzvo
 𫾷	mzvo
-𬀐	mzvo
 𭲅	mzvo
 𣺣	mzvu
 𣿃	mzvu
-𪰅	mzvu
 滯	mzvw
 淿	mzvw
-𣄐	mzvw
 𤬎	mzvw
 𪵴	mzvw
-𬀂	mzvw
-𬀤	mzvw
 𰝦	mzvw
 𱍲	mzvw
 𳀣	mzvw
@@ -67291,27 +67302,17 @@ encoder:
 𪡌	mzxo
 𫫐	mzxo
 潅	mzxu
-𣄑	mzxu
 𩎗	mzxu
-𱡳	mzyo
-𣃿	mzyr
 𪶾	mzyr
-𣃬	mzyu
-𪰀	mzyu
-𣄠	mzyw
 圭	mzzo
 邽	mzzo
 沋	mzzo
 𰛳	mzzo
 𱦑	mzzo
 𱧧	mzzo
-𬀘	mzzr
 㰪	mzzu
-𣄙	mzzu
 𣾂	mzzu
-𪯸	mzzu
 𭲄	mzzu
-𣃻	mzzw
 𭏆	n,,o
 𲙾	n,,o
 捾	n,,r
@@ -67503,6 +67504,7 @@ encoder:
 𭢀	n,su
 𰊏	n,su
 胄	n,sw
+冑	n,sw
 𢸘	n,to
 𢹷	n,to
 𩕡	n,to
@@ -71413,7 +71415,6 @@ encoder:
 𡏮	nphr
 𢮟	nphw
 𪓤	nphw
-冑	npjo
 𡉱	npjo
 𢪈	npjo
 𡑱	npjr
@@ -74829,7 +74830,6 @@ encoder:
 𪚮	pjcu
 𪭇	pjcu
 㤏	pjdu
-𠕲	pjdw
 𢠤	pjdw
 𤔚	pjdw
 𠕮	pjfo
@@ -74861,7 +74861,6 @@ encoder:
 憒	pjlr
 𠕥	pjmo
 𠕦	pjmo
-𠛹	pjmo
 𣌅	pjmr
 𪬝	pjmw
 𢘸	pjno
@@ -74880,8 +74879,9 @@ encoder:
 𢙩	pjpu
 𢥞	pjpu
 悝	pjpw
-𢖸	pjpw
+𠕲	pjpw
 怛	pjpw
+𢖸	pjpw
 𭜾	pjpw
 𫙅	pjqo
 融	pjqu
@@ -74899,7 +74899,6 @@ encoder:
 𩑞	pjto
 𭁝	pjtr
 ⺜	pjvo
-冃	pjvo
 冄	pjvo
 𘡻	pjvo
 𘡽	pjvo
@@ -74907,7 +74906,6 @@ encoder:
 𘥵	pjvo
 𘮼	pjvo
 𠀇	pjvo
-𠃛	pjvo
 𡆨	pjvo
 𡿲	pjvo
 𢽵	pjvo
@@ -75342,6 +75340,7 @@ encoder:
 𳂜	pplr
 𢠹	pplw
 𠆊	ppmo
+𠛹	ppmo
 𠜊	ppmo
 𠞜	ppmo
 𠞤	ppmo
@@ -76517,6 +76516,7 @@ encoder:
 𤥑	q,gu
 𤦾	q,gu
 𪻐	q,gw
+𤣽	q,gw
 𤤔	q,gw
 𭘆	q,gw
 𰢁	q,gw
@@ -79082,7 +79082,6 @@ encoder:
 𘁠	qpjo
 𘁪	qpjo
 𘨇	qpjo
-𤣽	qpjo
 𪻭	qpjw
 𱈈	qpjw
 疉	qpkr
@@ -81070,6 +81069,7 @@ encoder:
 𘟏	s;jo
 𡗋	s;jo
 𪕐	s;jo
+𭫛	s;jo
 㯶	s;jr
 櫦	s;jr
 𣖂	s;jr
@@ -82545,7 +82545,6 @@ encoder:
 棤	shhw
 𪲻	shhw
 槿	shjo
-𣗭	shjo
 櫌	shjr
 㚆	shjr
 榎	shjr
@@ -82646,6 +82645,7 @@ encoder:
 𳂰	shtu
 橵	shvo
 𢽺	shvo
+𣗭	shvo
 𣠨	shvo
 𦋷	shvo
 𭣾	shvo
@@ -83363,7 +83363,6 @@ encoder:
 檜	smhw
 𫅋	smhw
 𰓲	smhw
-𭫛	smjo
 𪕃	smjr
 𬄶	smju
 𭫵	smju
@@ -92955,6 +92954,7 @@ encoder:
 ⼫	vnno
 尸	vnno
 𠁣	vnno
+𠃛	vnno
 𠃜	vnno
 𡰲	vnno
 届	vnnr
@@ -102054,6 +102054,7 @@ encoder:
 𲓀	y;mo
 獜	y;mr
 𤜺	y;mr
+𦹭	y;mr
 𦺸	y;mr
 𲽚	y;mr
 𲮶	y;mu
@@ -104981,7 +104982,6 @@ encoder:
 薉	ymmr
 鿊	ymmr
 𦶼	ymmr
-𦹭	ymmr
 𧄻	ymmr
 𫈊	ymmr
 𫊉	ymmr
@@ -107801,6 +107801,7 @@ encoder:
 隉	z;gw
 𘰍	z;ho
 𨺺	z;ho
+𫕗	z;hr
 陹	z;hw
 𣈌	z;hw
 𨹞	z;hw
@@ -108909,7 +108910,6 @@ encoder:
 𗶱	zmgu
 𡰏	zmho
 𪬧	zmho
-𫕗	zmhr
 𢵿	zmhw
 㓸	zmjo
 㦘	zmjw
