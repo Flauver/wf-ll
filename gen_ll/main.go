@@ -219,8 +219,8 @@ func main() {
 			log.Println("开始生成玲珑多字词简码...")
 		}
 		
-		// 生成玲珑多字词简码
-		linglongSimpleCodes = tools.BuildWordsSimpleCode(linglongCodes, linglongLenCodeLimit)
+		// 生成玲珑多字词简码（不添加占位符）
+		linglongSimpleCodes = tools.BuildLinglongSimpleCode(linglongCodes, linglongLenCodeLimit)
 		
 		if !args.Quiet {
 			log.Printf("玲珑多字词简码生成完成，共 %d 项\n", len(linglongSimpleCodes))

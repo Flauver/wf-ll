@@ -577,6 +577,89 @@ func BuildWordsSimpleCode(wordCodes []*types.WordCode, lenCodeLimit map[int]int)
 	return resultData
 }
 
+// BuildLinglongSimpleCode 构建玲珑多字词简码（不添加占位符）
+func BuildLinglongSimpleCode(wordCodes []*types.WordCode, lenCodeLimit map[int]int) []*types.WordSimpleCode {
+	// 按权重降序排序（权重高的优先分配简码）
+	sortedWordCodes := make([]*types.WordCode, len(wordCodes))
+	copy(sortedWordCodes, wordCodes)
+	sort.Slice(sortedWordCodes, func(i, j int) bool {
+		weightA := parseWeight(sortedWordCodes[i].Weight)
+		weightB := parseWeight(sortedWordCodes[j].Weight)
+		return weightA > weightB
+	})
+
+	// 初始化每个简码长度的计数器
+	codeCounters := make(map[int]map[string]int)
+	for length := 1; length <= 3; length++ {
+		codeCounters[length] = make(map[string]int)
+	}
+
+	// 处理每个词
+	resultData := make([]*types.WordSimpleCode, 0)
+	for _, wordCode := range sortedWordCodes {
+		word := wordCode.Word
+		code := wordCode.Code
+		weight := wordCode.Weight
+		wordLength := len([]rune(word)) // 获取词的长度
+
+		// 按照顺序尝试分配简码：先一简，再二简，最后三简
+		var simplifiedCode string
+		for codeLength := 1; codeLength <= 3; codeLength++ {
+			// 检查该长度是否允许
+			limit := lenCodeLimit[codeLength]
+			if limit == 0 {
+				continue
+			}
+
+			// 检查该长度的简码是否适用于当前词
+			if codeLength == 2 && wordLength != 2 { // 二简只适用于二字词
+				continue
+			}
+			if codeLength == 3 && wordLength != 3 { // 三简只适用于三字词
+				continue
+			}
+
+			// 获取基础简码
+			var baseCode string
+			if codeLength == 2 && wordLength == 2 {
+				// 二字词特殊规则：首码 + 第三个码
+				if len(code) >= 3 {
+					baseCode = code[:1] + code[2:3]
+				} else {
+					continue // 编码长度不足，跳过
+				}
+			} else {
+				// 普通规则：取编码前codeLength位
+				if len(code) >= codeLength {
+					baseCode = code[:codeLength]
+				} else {
+					continue // 编码长度不足，跳过
+				}
+			}
+
+			// 检查是否已达到该基础简码的限制
+			currentCount := codeCounters[codeLength][baseCode]
+			if currentCount < limit {
+				// 创建新的简码条目
+				simplifiedCode = baseCode
+
+				resultData = append(resultData, &types.WordSimpleCode{
+					Word:   word,
+					Code:   simplifiedCode,
+					Weight: weight,
+				})
+				codeCounters[codeLength][baseCode] = currentCount + 1
+				break // 找到可用的简码后就不再尝试更长的简码
+			}
+		}
+	}
+
+	// 只排序，不添加占位符
+	SortWordSimpleCodes(resultData)
+
+	return resultData
+}
+
 // addPlaceholdersAfterSort 在排序后为多字词简码添加占位符
 func addPlaceholdersAfterSort(wordSimpleCodes []*types.WordSimpleCode, lenCodeLimit map[int]int) []*types.WordSimpleCode {
 	result := make([]*types.WordSimpleCode, 0, len(wordSimpleCodes))
