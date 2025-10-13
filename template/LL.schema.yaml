@@ -17,6 +17,9 @@ schema:
     ` 键拼音反查，e在「,」，i在「.」。symbols符号输入同理。
 
 switches:
+  - name: buffered
+    states: [结束造词, 开始造词]
+    reset: 0
   - name: charset_filter
     states: [ 大字集, 常用字 ]
     reset: 1
@@ -47,6 +50,7 @@ engine:
     - recognizer
     - lua_processor@*ll.div_spelling*processor
     - key_binder
+    - lua_processor@*ll.popping
     - speller
     - punctuator
     - selector
@@ -162,7 +166,9 @@ historyX:
 ll:
   code: *schema
   tags: [ abc ]
-  quick_code_indicator: "✨"
+  # emoji examples: ⚡️ 👤 🔝 🔥 ✨ ⬆️ 🫵🏻 🗲 🎯 📌 💡 🌟
+  quick_code_indicator: "🌟"
+  custom_phrases_indicator: "💡"
   spelling:
     schema: *cf
     cycle_key: "Shift+Control+C"
@@ -179,6 +185,8 @@ key_binder:
     - {accept: 4, send: "7", when: has_menu}
     #- {accept: "Control+Control_L", send: "8", when: has_menu}
     - {accept: "Shift+Shift_L", send: "9", when: has_menu}
+    - {accept: i, toggle: buffered, when: always}
+    - {accept: "Control+k", send: "Shift+Delete", when: has_menu}
     - {accept: "5", toggle: charset_filter, when: has_menu}
     - {accept: minus, send: Page_Up, when: has_menu}
     - {accept: equal, send: Page_Down, when: has_menu}
