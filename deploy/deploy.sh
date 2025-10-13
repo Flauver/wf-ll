@@ -74,18 +74,27 @@ gen_schema() {
         cp -r "${NAME}"/*.txt "${LL}"
     fi
 
+    # 确保玲珑.txt文件存在
+    if [ ! -f "${LL}/玲珑.txt" ]; then
+        log "警告: 玲珑.txt文件不存在，跳过玲珑多字词处理"
+    fi
+
     log "生成${NAME}码表..."
     ./gen_ll -q \
         -d "${LL}/ll_div.txt" \
         -m "${LL}/ll_map.txt" \
         -w "${LL}/ll_words.txt" \
+        -L "${LL}/玲珑.txt" \
         -f "${LL}/freq.txt" \
         -l "1:4,2:4,3:0,4:0" \
-        -L "1:4,2:4,3:4,4:0" \
+        -wL "1:4,2:4,3:4,4:0" \
+        -ll "1:4,2:4,3:4,4:0" \
         -u "${LL}/code_chars_full.txt" \
         -s "${LL}/code_chars_simp.txt" \
         -W "${LL}/code_words_full.txt" \
         -S "${LL}/code_words_simp.txt" \
+        -F "${LL}/linglong_full.txt" \
+        -Q "${LL}/linglong_simp.txt" \
         -o "${LL}/div_ll.txt" \
         -Z "${LL}/大竹_chai.txt" \
         -C \
@@ -98,6 +107,8 @@ gen_schema() {
 
     log "准备生成Rime方案..."
     rsync -a --exclude='/code_*.txt' \
+        --exclude='/玲珑.txt' \
+        --exclude='/linglong_*.txt' \
         --exclude='/div_ll.txt' \
         --exclude='/freq.txt' \
         --exclude='/ll_citi_pre.txt' \
@@ -120,6 +131,7 @@ gen_schema() {
             --exclude="weasel.yaml" \
             --exclude="LL.txt" \
             --exclude="大竹*.txt" \
+            --exclude="跟打词提.txt" \
             --exclude="speed_stats.conf" \
             "./ll" | \
             zstd -9 -T0 -c \

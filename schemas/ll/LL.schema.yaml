@@ -11,6 +11,7 @@ schema:
     - &py PY
     - &bh xtroke
     - &cf LL_chaifen
+    - &ll LL_linglong
   description: |
     前缀码 + 高性能多重简词
     ` 键拼音反查，e在「,」，i在「.」。symbols符号输入同理。
@@ -65,11 +66,13 @@ engine:
     - history_translator
     - script_translator@PY_lookup
     - table_translator@xtroke_lookup
+    - table_translator@fixed
     - table_translator
     - lua_translator@*ll.speed_stats
     - history_translator@historyX
   filters: 
     - lua_filter@*ll.charset_filter
+    - lua_filter@*ll.fix_filter
     - reverse_lookup_filter@reverse_lookup
     - lua_filter@*ll.div_spelling*filter
     - uniquifier 
@@ -79,16 +82,25 @@ speller:
   delimiter: "`"
   auto_select: true
 
+fixed:
+  __include: translator
+  dictionary: *ll
+  prism: *ll
+  enable_user_dict: false
+  enable_sentence: false
+  initial_quality: 100000
+
 translator:
   dictionary: *schema
   prism: *schema
   enable_completion: false
   enable_sentence: false
-  enable_user_dict: false
+  enable_user_dict: true
   enable_encoder: true
   encode_commit_history: false
   max_phrase_length: 4
   always_show_comments: true
+  initial_quality: 1000
   preedit_format: []
   comment_format:
     - "xform/^~/ /"
@@ -141,6 +153,7 @@ historyX:
 ll:
   code: *schema
   tags: [ abc ]
+  quick_code_indicator: "✨"
   spelling:
     schema: *cf
     cycle_key: "Shift+Control+C"

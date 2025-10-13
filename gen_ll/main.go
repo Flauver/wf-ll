@@ -23,14 +23,18 @@ type Args struct {
 	Map        string `flag:"m" usage:"映射表文件"  default:"../deploy/hao/ll_map.txt"`
 	Freq       string `flag:"f" usage:"频率表文件"  default:"../deploy/hao/freq.txt"`
 	Words      string `flag:"w" usage:"多字词文件"  default:"../deploy/hao/ll_words.txt"`
-	Full       string `flag:"u" usage:"输出全码表文件" default:"/tmp/code_full.txt"`
+	Linglong   string `flag:"L" usage:"玲珑多字词文件"  default:"../deploy/hao/玲珑.txt"`
+	Full       string `flag:"u" usage:"输出单字全码表文件" default:"/tmp/code_full.txt"`
 	Opencc     string `flag:"o" usage:"输出拆分表文件"  default:"/tmp/div.txt"`
 	Simple     string `flag:"s" usage:"输出单字简码表文件" default:"/tmp/code_simp.txt"`
 	WordsFull  string `flag:"W" usage:"输出多字词全码表文件" default:"/tmp/words_full.txt"`
 	WordsSimple string `flag:"S" usage:"输出多字词简码表文件" default:"/tmp/words_simp.txt"`
+	LinglongFull string `flag:"F" usage:"输出玲珑多字词全码表文件" default:"/tmp/linglong_full.txt"`
+	LinglongSimple string `flag:"Q" usage:"输出玲珑多字词简码表文件" default:"/tmp/linglong_simp.txt"`
 	DazhuChai  string `flag:"Z" usage:"输出大竹拆文件" default:"/tmp/dazhu_chai.txt"`
 	LenCodeLimit string `flag:"l" usage:"单字简码长度限制，格式：1:4,2:4,3:0,4:0" default:"1:4,2:4,3:0,4:0"`
-	WordsLenCodeLimit string `flag:"L" usage:"多字词简码长度限制，格式：1:4,2:4,3:4,4:0" default:"1:4,2:4,3:4,4:0"`
+	WordsLenCodeLimit string `flag:"wL" usage:"多字词简码长度限制，格式：1:4,2:4,3:4,4:0" default:"1:4,2:4,3:4,4:0"`
+	LinglongLenCodeLimit string `flag:"ll" usage:"玲珑多字词简码长度限制，格式：1:4,2:4,3:4,4:0" default:"1:4,2:4,3:4,4:0"`
 	CPUProfile string `flag:"p" usage:"CPU性能分析文件" default:"/tmp/gen_ll.prof"`
 	Debug      bool   `flag:"D" usage:"调试模式" default:"false"`
 	CitiPre    string `flag:"c" usage:"输出ll_citi_pre.txt文件" default:"/tmp/ll_citi_pre.txt"`
@@ -73,6 +77,8 @@ func main() {
 	ensureOutputDir(args.Simple)
 	ensureOutputDir(args.WordsFull)
 	ensureOutputDir(args.WordsSimple)
+	ensureOutputDir(args.LinglongFull)
+	ensureOutputDir(args.LinglongSimple)
 	ensureOutputDir(args.DazhuChai)
 	ensureOutputDir(args.CitiPre)
 	ensureOutputDir(args.GendaCiti)
@@ -90,6 +96,12 @@ func main() {
 	wordsLenCodeLimit, err := tools.ParseLenCodeLimit(args.WordsLenCodeLimit)
 	if err != nil {
 		log.Fatalf("解析多字词简码长度限制失败: %v", err)
+	}
+
+	// 解析玲珑多字词简码长度限制
+	linglongLenCodeLimit, err := tools.ParseLenCodeLimit(args.LinglongLenCodeLimit)
+	if err != nil {
+		log.Fatalf("解析玲珑多字词简码长度限制失败: %v", err)
 	}
 
 	// 记录开始时间
@@ -181,6 +193,40 @@ func main() {
 		}
 	}
 
+	// 读取玲珑多字词文件并生成玲珑多字词全码和简码
+	var linglongCodes []*types.WordCode
+	var linglongSimpleCodes []*types.WordSimpleCode
+	if !args.Quiet {
+		log.Println("开始读取玲珑多字词文件...")
+	}
+	linglongEntries, err := tools.ReadWordsFile(args.Linglong)
+	if err != nil {
+		log.Printf("读取玲珑多字词文件失败: %v", err)
+	} else {
+		if !args.Quiet {
+			log.Printf("玲珑多字词文件加载完成，共 %d 项\n", len(linglongEntries))
+			log.Println("开始生成玲珑多字词全码...")
+		}
+		
+		// 创建字符编码映射
+		charCodeMap := tools.CreateCharCodeMap(fullCodeMetaList)
+		
+		// 生成玲珑多字词全码
+		linglongCodes = tools.BuildWordsFullCode(linglongEntries, charCodeMap)
+		
+		if !args.Quiet {
+			log.Printf("玲珑多字词全码生成完成，共 %d 项\n", len(linglongCodes))
+			log.Println("开始生成玲珑多字词简码...")
+		}
+		
+		// 生成玲珑多字词简码
+		linglongSimpleCodes = tools.BuildWordsSimpleCode(linglongCodes, linglongLenCodeLimit)
+		
+		if !args.Quiet {
+			log.Printf("玲珑多字词简码生成完成，共 %d 项\n", len(linglongSimpleCodes))
+		}
+	}
+
 	// 生成简码表
 	if !args.Quiet {
 		log.Println("开始生成简码表...")
@@ -201,6 +247,12 @@ func main() {
 		fileCount++
 	}
 	if wordSimpleCodes != nil {
+		fileCount++
+	}
+	if linglongCodes != nil {
+		fileCount++
+	}
+	if linglongSimpleCodes != nil {
 		fileCount++
 	}
 	wg.Add(fileCount)
@@ -370,6 +422,57 @@ func main() {
 		}()
 	}
 
+	// 写入玲珑多字词全码表
+	if linglongCodes != nil {
+		go func() {
+			defer wg.Done()
+			buffer := bytes.Buffer{}
+			
+			// 保持玲珑.txt的原始顺序，不进行排序
+			for _, wordCode := range linglongCodes {
+				if wordCode.Weight != "" {
+					buffer.WriteString(fmt.Sprintf("%s\t%s\t%s\n", wordCode.Word, wordCode.Code, wordCode.Weight))
+				} else {
+					buffer.WriteString(fmt.Sprintf("%s\t%s\n", wordCode.Word, wordCode.Code))
+				}
+			}
+			err := os.WriteFile(args.LinglongFull, buffer.Bytes(), 0o644)
+			if err != nil {
+				errChan <- fmt.Errorf("写入玲珑多字词全码表文件错误: %w", err)
+			} else if !args.Quiet {
+				log.Printf("玲珑多字词全码表文件写入完成: %s\n", args.LinglongFull)
+			}
+		}()
+	}
+
+	// 写入玲珑多字词简码表
+	if linglongSimpleCodes != nil {
+		go func() {
+			defer wg.Done()
+			buffer := bytes.Buffer{}
+			
+			// 对玲珑多字词简码进行排序
+			// 先按编码升序排列，编码相同时按权重降序排列
+			sortedLinglongSimpleCodes := make([]*types.WordSimpleCode, len(linglongSimpleCodes))
+			copy(sortedLinglongSimpleCodes, linglongSimpleCodes)
+			tools.SortWordSimpleCodes(sortedLinglongSimpleCodes)
+			
+			for _, wordSimpleCode := range sortedLinglongSimpleCodes {
+				if wordSimpleCode.Weight != "" {
+					buffer.WriteString(fmt.Sprintf("%s\t%s\t%s\n", wordSimpleCode.Word, wordSimpleCode.Code, wordSimpleCode.Weight))
+				} else {
+					buffer.WriteString(fmt.Sprintf("%s\t%s\n", wordSimpleCode.Word, wordSimpleCode.Code))
+				}
+			}
+			err := os.WriteFile(args.LinglongSimple, buffer.Bytes(), 0o644)
+			if err != nil {
+				errChan <- fmt.Errorf("写入玲珑多字词简码表文件错误: %w", err)
+			} else if !args.Quiet {
+				log.Printf("玲珑多字词简码表文件写入完成: %s\n", args.LinglongSimple)
+			}
+		}()
+	}
+
 	// 等待所有写入操作完成
 	wg.Wait()
 	close(errChan)
@@ -465,6 +568,28 @@ func main() {
 		log.Printf("追加code_words_full.txt到LL.words.full.dict.yaml失败: %v", err)
 	} else if !args.Quiet {
 		log.Println("code_words_full.txt追加到LL.words.full.dict.yaml完成")
+	}
+	
+	// 将linglong_full.txt追加到LL_linglong.full.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		log.Println("将linglong_full.txt追加到LL_linglong.full.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.LinglongFull, filepath.Join(outputDir, "LL_linglong.full.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加linglong_full.txt到LL_linglong.full.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		log.Println("linglong_full.txt追加到LL_linglong.full.dict.yaml完成")
+	}
+	
+	// 将linglong_simp.txt追加到LL_linglong.quick.dict.yaml（需要排序和删除词频）
+	if !args.Quiet {
+		log.Println("将linglong_simp.txt追加到LL_linglong.quick.dict.yaml...")
+	}
+	err = tools.AppendToDictFile(args.LinglongSimple, filepath.Join(outputDir, "LL_linglong.quick.dict.yaml"), true, true)
+	if err != nil {
+		log.Printf("追加linglong_simp.txt到LL_linglong.quick.dict.yaml失败: %v", err)
+	} else if !args.Quiet {
+		log.Println("linglong_simp.txt追加到LL_linglong.quick.dict.yaml完成")
 	}
 	
 	// 生成字根码表并追加到LL.roots.dict.yaml
