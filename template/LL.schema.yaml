@@ -67,6 +67,7 @@ engine:
     - script_translator@PY_lookup
     - table_translator@xtroke_lookup
     - table_translator@fixed
+    - table_translator@custom_phrase
     - table_translator
     - lua_translator@*ll.speed_stats
     - history_translator@historyX
@@ -89,6 +90,14 @@ fixed:
   enable_user_dict: false
   enable_sentence: false
   initial_quality: 100000
+
+custom_phrase: # 自定義短語
+  dictionary: ""
+  user_dict: LL_custom_phrases
+  db_class: stabledb
+  enable_completion: false
+  enable_sentence: false
+  initial_quality: 10000
 
 translator:
   dictionary: *schema
