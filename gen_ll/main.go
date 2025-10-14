@@ -490,7 +490,8 @@ func main() {
 	// 处理跟打词提
 	if args.ProcessCiti {
 		log.Println("开始处理跟打词提文件...")
-		err := tools.ProcessCitiFilesComplete(args.Simple, args.Full, args.WordsSimple, args.WordsFull, args.CitiPre, args.GendaCiti)
+		// 使用玲珑词库的词语部分
+		err := tools.ProcessCitiFilesWithLinglong(args.Simple, args.Full, args.LinglongSimple, args.LinglongFull, args.CitiPre, args.GendaCiti)
 		if err != nil {
 			log.Printf("处理跟打词提文件失败: %v", err)
 		} else {
