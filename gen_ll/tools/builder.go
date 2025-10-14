@@ -388,13 +388,22 @@ func BuildWordsFullCode(wordEntries []*types.WordEntry, charCodeMap map[string]s
 		word := entry.Word
 		chars := []rune(word)
 		
-		// 根据词语长度应用不同的编码规则
+		// 先去除所有标点符号，只保留可编码的汉字字符
+		var validChars []rune
+		for _, char := range chars {
+			charStr := string(char)
+			if code := charCodeMap[charStr]; code != "" && len(code) >= 1 {
+				validChars = append(validChars, char)
+			}
+		}
+		
+		// 根据去除标点后的有效字符数量应用编码规则
 		var code string
-		switch len(chars) {
+		switch len(validChars) {
 		case 2:
 			// 二字词：取每个字编码的前2位，拼接成4位编码
-			firstCode := charCodeMap[string(chars[0])]
-			secondCode := charCodeMap[string(chars[1])]
+			firstCode := charCodeMap[string(validChars[0])]
+			secondCode := charCodeMap[string(validChars[1])]
 			
 			if len(firstCode) >= 2 && len(secondCode) >= 2 {
 				code = firstCode[:2] + secondCode[:2]
@@ -402,9 +411,9 @@ func BuildWordsFullCode(wordEntries []*types.WordEntry, charCodeMap map[string]s
 			
 		case 3:
 			// 三字词：前两个字各取编码的第1位，第三个字取编码的前2位
-			firstCode := charCodeMap[string(chars[0])]
-			secondCode := charCodeMap[string(chars[1])]
-			thirdCode := charCodeMap[string(chars[2])]
+			firstCode := charCodeMap[string(validChars[0])]
+			secondCode := charCodeMap[string(validChars[1])]
+			thirdCode := charCodeMap[string(validChars[2])]
 			
 			if len(firstCode) >= 1 && len(secondCode) >= 1 && len(thirdCode) >= 2 {
 				code = firstCode[:1] + secondCode[:1] + thirdCode[:2]
@@ -412,11 +421,11 @@ func BuildWordsFullCode(wordEntries []*types.WordEntry, charCodeMap map[string]s
 			
 		default:
 			// 四字及以上：取第一、二、三个字和最后一个字编码的第1位
-			if len(chars) >= 4 {
-				firstCode := charCodeMap[string(chars[0])]
-				secondCode := charCodeMap[string(chars[1])]
-				thirdCode := charCodeMap[string(chars[2])]
-				lastCode := charCodeMap[string(chars[len(chars)-1])]
+			if len(validChars) >= 4 {
+				firstCode := charCodeMap[string(validChars[0])]
+				secondCode := charCodeMap[string(validChars[1])]
+				thirdCode := charCodeMap[string(validChars[2])]
+				lastCode := charCodeMap[string(validChars[len(validChars)-1])]
 				
 				if len(firstCode) >= 1 && len(secondCode) >= 1 && len(thirdCode) >= 1 && len(lastCode) >= 1 {
 					code = firstCode[:1] + secondCode[:1] + thirdCode[:1] + lastCode[:1]
