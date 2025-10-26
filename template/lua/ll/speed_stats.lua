@@ -582,7 +582,7 @@ function M.init(env)
     
     -- Connect event handlers
     env.engine.context.commit_notifier:connect(commit_callback)
-    env.engine.context.key_event_notifier:connect(key_event_callback)
+    env.engine.context.unhandled_key_notifier:connect(key_event_callback)
     
     M.init_flag = true
     debug_print("Speed statistics plugin initialized")

@@ -310,7 +310,7 @@ function MainProcessor.fini(env)
     end
 end
 
-function MainProcessor.process_key(key, env)
+function MainProcessor.func(key, env)
     local context = env.engine.context
     local current_segment = context.composition:back()
     
@@ -331,7 +331,6 @@ function MainProcessor.process_key(key, env)
         
         local commit_text = env.current_hint:match("：%s*(.*)%s*") or
                           env.current_hint:match(":%s*(.*)%s*")
-        
         if commit_text and #commit_text > 0 then
             env.engine:commit_text(commit_text)
             context:clear()
